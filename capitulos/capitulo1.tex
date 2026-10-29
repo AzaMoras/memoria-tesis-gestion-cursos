@@ -42,10 +42,24 @@ Desarrollar un sistema web de gestión de cursos e inscripciones en línea para 
 
 \end{enumerate}
 
+
 \section{Alcance}
 
+El proyecto contempla el desarrollo de un sistema web para la gestión de cursos e inscripciones en línea, dirigido a instituciones de capacitación que requieran centralizar sus procesos académicos y administrativos. La plataforma permitirá la administración de usuarios, cursos, grupos, inscripciones, materiales educativos, evaluaciones, pagos y constancias digitales.
+
+El sistema contará con cinco roles principales: administrador, coordinador, recepción, instructor y participante, cada uno con permisos específicos de acuerdo con sus responsabilidades. Asimismo, incorporará mecanismos de autenticación y autorización, validación de requisitos, control de cupos y seguimiento del desempeño académico de los participantes.
+
+La aplicación estará orientada a cursos virtuales, tanto autogestionados como acompañados por instructores, y se desarrollará mediante el framework Laravel, bajo una arquitectura Modelo-Vista-Controlador (MVC) complementada con una capa de servicios y una base de datos MariaDB. Su funcionamiento se verificará mediante pruebas automatizadas para comprobar el cumplimiento de las principales reglas de negocio.
 
 \section{Limitación}
+
+El sistema estará orientado exclusivamente a la administración de cursos en modalidad virtual, por lo que no contemplará la gestión de aulas físicas, instalaciones educativas ni actividades académicas presenciales.
+
+Su funcionamiento dependerá de una conexión a internet y de la disponibilidad de la infraestructura tecnológica donde se encuentre alojado. Asimismo, el rendimiento y la capacidad de atención simultánea estarán sujetos a los recursos del servidor y a la configuración del entorno de despliegue.
+
+El registro de cuentas de usuario estará restringido al personal autorizado, por lo que los solicitantes no podrán crear cuentas directamente sin un proceso previo de revisión y aprobación. Además, la plataforma no desarrollará herramientas propias de videoconferencia, sino que podrá utilizar enlaces a servicios externos para las sesiones virtuales.
+
+Finalmente, las pruebas del sistema se realizarán en un entorno controlado, por lo que sus resultados permitirán verificar el comportamiento de las funcionalidades implementadas, sin garantizar el mismo rendimiento bajo todas las condiciones posibles de operación.
 
 \section{Problemática}
 
