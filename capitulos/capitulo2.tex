@@ -1,67 +1,359 @@
-\chapter{Marco Teórico.}
+\chapter{Marco Teórico}
 
-En el desarrollo de sistemas de control para vehículos aéreos no tripulados (UAVs), los Vehículos de Despegue y Aterrizaje Vertical (VTOL, por sus siglas en inglés) y sus variantes Planas (PVTOL) han captado una atención significativa debido a sus aplicaciones en diversas áreas como la vigilancia \cite{johnson1997arti}, entrega de paquetes \cite{9129495} y exploración \cite{5278262}. Este capítulo aborda los principios teóricos que respaldan el diseño y control de estos vehículos, incluyendo modelos matemáticos y técnicas avanzadas de control.
-En primer lugar, se describen los enfoques de modelado matemático utilizados para representar el comportamiento dinámico de los VTOL y PVTOL. Estos modelos son esenciales para comprender y predecir las respuestas del sistema ante diferentes estímulos. Particularmente, se emplea el formalismo de Euler-Lagrange, un método robusto y ampliamente aceptado en la dinámica de sistemas mecánicos.
+El desarrollo de soluciones de software destinadas a la gestión educativa exige una sólida fundamentación interdisciplinaria que conjugue principios de la ingeniería de software, los modelos de bases de datos relacionales, la seguridad informática y las dinámicas pedagógicas de la educación mediada por tecnologías digitales. Un sistema orientado a la administración de cursos e inscripciones en línea no solo opera como un repositorio de recursos instruccionales, sino como un sistema de información sociotécnico donde convergen múltiples actores con responsabilidades diferenciadas, procesos administrativos rigurosos, políticas de evaluación formativa y sumativa, y normativas institucionales de acreditación.
 
-\section{Sección}
+En este capítulo se exponen los conceptos, modelos teóricos y tecnologías que sustentan la concepción y diseño arquitectónico de \say{Aula Verde: Sistema de Gestión de Cursos e Inscripciones en Línea}. Se examinan inicialmente la naturaleza y relevancia de los sistemas de información aplicados a la gestión académica y las particularidades de la educación virtual en sus diversas modalidades. Posteriormente, se detallan las reglas de negocio vinculadas a los procesos de inscripción, el autorregistro de participantes, los prerrequisitos académicos, los fundamentos del patrón arquitectónico Modelo-Vista-Controlador complementado con una capa de servicios, el modelo de datos relacional y las garantías transaccionales. Asimismo, se abordan los principios esenciales de autenticación y control de acceso basado en roles, las teorías pedagógicas de evaluación formativa, el aprendizaje para el dominio y los ciclos de reforzamiento, concluyendo con las directrices de aseguramiento de la calidad mediante pruebas automatizadas y las estrategias contemporáneas de virtualización mediante contenedores para el despliegue de aplicaciones web.
 
-La capacidad de despegue y aterrizaje vertical (VTOL) es muy apreciada en los vehículos aéreos no tripulados (UAV) y tripulados (MAV), siempre que se alcance un rendimiento de vuelo comparable. La tecnología VTOL no solo resulta muy adecuada para los UAV debido a los requisitos de misión y la necesidad de ocultación, sino que también es de gran importancia para los MAV, tanto en aplicaciones militares como civiles, debido a las ventajas que ofrece, como una menor o incluso nula dependencia de aeropuertos o campos de aviación.
+\section{Sistemas de información y gestión académica}
 
-\section{Sección 2}
+Un sistema de información se define formalmente como un conjunto de componentes interrelacionados que recolectan, procesan, almacenan y distribuyen información para apoyar la toma de decisiones, la coordinación, el análisis y el control en una organización \cite{laudon2020management}. Lejos de constituir únicamente infraestructura computacional, los sistemas de información articulan de manera armónica a las personas, los procesos operativos, las estructuras de datos y las tecnologías subyacentes, conformando un entorno sociotécnico indispensable para la operación institucional moderna.
 
-El modelo PVTOL (Plataforma Vertical Despegue y Aterrizaje) describe el movimiento vertical de un objeto en un plano, caracterizado por tres grados de libertad $(x, y, \phi)$ que corresponden a la posición y la orientación del objeto en dicho plano. Este sistema incluye dos propulsores independientes que generan fuerzas y momentos en la máquina voladora, como se muestra en la figura \ref{fig1:PVTOL}. Es importante destacar que el PVTOL es un sistema subactuado, ya que aunque tiene tres grados de libertad, solo cuenta con dos entradas para su control. Debido a esta característica, el PVTOL constituye un desafío significativo en el ámbito del control no lineal \cite{lin1999robust}.
+En las organizaciones, pequeñas instituciones educativas privadas y centros de capacitación continua, la administración de la actividad formativa comprende una dualidad de procesos estrechamente vinculados: los procesos académicos, centrados en el diseño curricular, la entrega de contenidos pedagógicos, el acompañamiento docente, el seguimiento formativo y la evaluación de competencias; y los procesos administrativos, responsables de la difusión de convocatorias, el registro de participantes, el control de cupos, la gestión financiera y la emisión formal de constancias de acreditación. La desarticulación entre ambas esferas cuando se gestionan mediante herramientas aisladas suele generar dispersión de datos, duplicidad en las actividades de captura y demoras que afectan directamente la experiencia de los participantes y el desempeño de los equipos de trabajo.
 
+La implementación de un sistema de información centralizado permite consolidar una fuente compartida de información para toda la institución, facilitando la consistencia de los datos a lo largo de su ciclo de vida, habilitando consultas ágiles sobre el estado operativo de los grupos formativos y proveyendo una rigurosa trazabilidad de las acciones ejecutadas por cada usuario. No obstante, es un principio de la ingeniería de sistemas reconocer que la centralización técnica no garantiza por sí sola la integridad absoluta ni la seguridad de la información si no se acompaña de reglas de negocio consistentes, validaciones en el servidor y políticas de autorización estrictas que delimiten las facultades de cada actor en el sistema.
 
-\subsection{Subsección}
-El modelado y diseño de control para plataformas UAV es un trabajo difícil debido a su complicada estructura no lineal y subactuada, donde su comportamiento es función de efectos aerodinámicos, estructura mecánica, perturbaciones, incertidumbre, etc. 
+\section{Educación virtual y plataformas de aprendizaje}
 
-\section{Modelos matemáticos.}
+\subsection{Educación y capacitación virtual}
 
-Para entender los sistemas, es esencial desarrollar modelos matemáticos que los representen con exactitud. Un modelo de un sistema se describe como una representación de sus características relevantes, y el proceso de abstracción necesario para crear esta representación se conoce como modelado. El modelo es una versión simplificada de una realidad compleja; el término \say{modelar}se refiere a crear una descripción que capture de manera precisa un sistema y sus actividades. Los modelos científicos se desarrollan para realizar inferencias sobre ciertos aspectos de sistemas reales previamente observados. Este proceso de creación y utilización de un modelo se ilustra en la figura \ref{fig: tipos de modelo} a). Estos modelos se pueden clasificar de acuerdo al conocimiento previo sobre el proceso ilustrados en la figura \ref{fig: tipos de modelo} b).
+La educación virtual, comprendida en el marco del aprendizaje en línea (\textit{e-learning}), representa una modalidad de enseñanza y aprendizaje sustentada en el aprovechamiento de redes de comunicación y plataformas digitales para facilitar el acceso estructurado al conocimiento sin las restricciones de coexistencia física simultánea en el espacio o en el tiempo \cite{unesco2023technology}. Esta modalidad permite a las organizaciones optimizar la distribución de materiales didácticos, flexibilizar los trayectos formativos y atender a comunidades estudiantiles dispersas territorialmente.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth, height=8cm]{imagenes/esquema_modelado.png}
-    \caption{Sistema de modelado.}
-    \label{fig: tipos de modelo}
-\end{figure}
+El éxito de la capacitación virtual descansa en condiciones estructurales específicas, tales como la disponibilidad de conectividad a internet, interfaces accesibles y el diseño pedagógico explícito de los itinerarios formativos. En este contexto, el entorno virtual no debe entenderse como una simple transposición digital del aula presencial, sino como un ecosistema planificado donde los participantes interactúan con recursos digitales, realizan entregas de evidencias, desarrollan ejercicios de autoevaluación y reciben retroalimentación conforme a criterios pedagógicos y administrativos predeterminados.
 
-Otra forma de modelar un sistema es mediante modelos matemáticos, los cuales replican las relaciones de entrada(s) - salida(s) utilizando expresiones matemáticas. Cuando existe una relación lineal entre la entrada y la salida, el modelo matemático se expresa como:
-\begin{equation}
-     y(t) = u(t)k_{p}
-     \label{eq_modelo}
-\end{equation}
+\subsection{Sistemas de gestión del aprendizaje (LMS)}
 
-Donde $y(t)$ es la salida, $u(t)$ es la entrada del sistema, y $k_{p}$ es la constante de proporcionalidad. No obstante, la ecuación (\ref{eq_modelo}) implica que cualquier cambio en la entrada se reflejará instantáneamente en la salida, lo cual no es cierto en sistemas reales, ya que la salida requiere tiempo para ajustarse. Esta relación se cumple únicamente cuando se ha alcanzado un tiempo suficiente para estabilizarse, conocido como la condición de estado estable, y puede representarse como:\\
-\textit{El Valor en estado estable de $u(t)$ = $y(t)$ por el Valor en estado estable de $k_{p}$}
-\begin{equation}
-    k_{p} = \frac{y(t)}{u(t)}
-\end{equation}
+Los Sistemas de Gestión del Aprendizaje (\textit{Learning Management Systems}, LMS) son aplicaciones de software diseñadas específicamente para crear, distribuir, administrar y evaluar procesos de aprendizaje interactivos en entornos virtuales. Un LMS integra funcionalidades para la catalogación de contenidos, la gestión de cohortes de alumnos, la calendarización de actividades, la aplicación de instrumentos de evaluación y el registro cuantitativo del progreso pedagógico.
 
-Donde $k_{p}$ se refiere a la ganancia del sistema o función de transferencia. Así, una función de transferencia se define como la relación entre la salida en estado estable y la entrada en estado estable de un sistema.
+En el ámbito del software libre existen dos referentes de amplia trayectoria que ilustran las capacidades y la arquitectura de estos sistemas. Por una parte, Moodle destaca por su arquitectura modular extensible mediante complementos o \textit{plugins}, permitiendo adaptar sus métodos de matriculación (\textit{enrolment plugins}) a dinámicas tanto manuales como automatizadas \cite{moodle2024enrolment}. Por otra parte, la plataforma Open edX fundamenta su diseño en una arquitectura desacoplada a gran escala, separando el subsistema de autoría y secuenciación curricular (\textit{Studio}) del entorno de entrega y visualización del estudiante (\textit{LMS}) \cite{openedx2024platform, openedx2024courseoutline}. Asimismo, plataformas enfocadas en la formación técnica y laboral como Cisco Networking Academy \cite{cisco2024netacad} y Capacítate para el Empleo \cite{fundacion2024capacitate} han popularizado esquemas de capacitación modular con acceso ágil y evaluación continua del aprendizaje.
 
- 
-\subsection{Formalismo de Euler-Lagrange.}
+No obstante, existe una distinción analítica fundamental entre una plataforma orientada exclusivamente a la entrega de contenidos pedagógicos y un sistema adaptado a los flujos de gestión de centros de capacitación pequeños. Mientras que las grandes plataformas educativas suelen concentrarse en la interacción instruccional dentro del aula virtual o en esquemas masivos estandarizados, las pequeñas organizaciones requieren gobernar conjuntamente tanto el acceso ágil de los usuarios como los flujos operativos propios: autorregistro directo con verificación de correo, control estricto de cupos con listas de espera automáticas, administración modular de prerrequisitos por curso y verificación de comprobantes de pago sin cargas burocráticas innecesarias. Dicha articulación operativa constituye el propósito central de Aula Verde.
 
-La formulación Lagrangiana proporciona una forma de modelar la dinámica de un robot al analizar el balance de energía. En este enfoque, el robot se conceptualiza como una entidad cerrada, y las ecuaciones derivadas se centran únicamente en la energía almacenada, representada a través de las energías cinética y potencial. Para un robot dado, los resultados obtenidos mediante esta formulación son idénticos a los obtenidos mediante la formulación de Newton-Euler.
-El Lagrangiano es una función escalar definida como la diferencia entre las energías cinética y potencial de un sistema mecánico, en función de las llamadas coordenadas generalizadas \cite{torres2002robots}. En la figura \ref{fig 2_2: Esquema de Euler_lagrange} se desarrolla en detalle la formulación Lagrangiana.
+\subsection{Modalidades virtuales: autogestionada y con acompañamiento docente}
 
+El diseño formativo del sistema contempla dos modalidades de aprendizaje claramente diferenciadas en su dinámica pedagógica, manteniendo como principio rector que \textbf{ambas modalidades son 100\,\% virtuales}, excluyendo cualquier tipo de presencialidad física, salones de clase o laboratorios presenciales:
 
-\begin{equation}
-J_{i}=
-    \begin{bmatrix}
-        \lambda_{i} & 1           & 0      &...  & 0  \\
-        0           & \lambda_{i} & 1      & ...& 0 \\
-        \vdots      & \vdots      & \ddots & \ddots & \vdots \\
-             0   &    0    &  ... & \lambda_{i} & 1   \\
-           0 &   0   &  ...       &  0   & \lambda_{i} \\
-    \end{bmatrix}_{m \times m}
-\end{equation}
+\begin{enumerate}
+    \item \textbf{Cursos autogestionados:} El participante accede a los materiales instruccionales, lecciones audiovisuales previamente elaboradas por instructores, lecturas y evaluaciones de forma asíncrona, administrando de manera autónoma su ritmo de aprendizaje. El avance y la acreditación se determinan mediante el cumplimiento secuencial de módulos y cuestionarios automatizados dentro de los plazos de vigencia definidos para el curso.
+    \item \textbf{Cursos con acompañamiento de instructor mentor:} Incorporan la guía continua de un instructor que asume el rol de mentor académico \cite{garrison2000critical}. Esta modalidad combina recursos digitales con retroalimentación cualitativa en actividades, resolución de dudas y, cuando el diseño del curso lo establezca, sesiones virtuales en vivo o conferencias mediante enlaces a servicios externos de videoconferencia. La asistencia a dichas sesiones sincrónicas constituye un requisito de acreditación únicamente si la institución o la convocatoria del curso lo determina expresamente.
+\end{enumerate}
 
-Donde $J_{i}$ es el bloque de Jordan asociado al eigenvalor $\lambda_{i}$  en $A$ y $m$ es el orden del bloque de Jordan. Esta representación es útil porque simplifica el análisis de la dinámica de sistemas lineales, especialmente cuando $A$ no es diagonalizable. La solución del sistema en términos de la forma de Jordan es:
+En el cuadro \ref{tabla:modalidades_virtuales} se presenta una comparación sistemática de las características operativas y pedagógicas de ambas modalidades virtuales dentro del sistema.
 
-\begin{equation}
-     exp(at) = P exp(Jt) P^{-1} = \sum_{i=1}^{r}\sum_{k=1}^{m_{i}}t^{k-1}exp(\lambda_{i}t)R_{ik}
-\end{equation}
+\begin{table}[htbp]
+\centering
+\caption{Comparación de modalidades de formación virtual en el sistema.}
+\label{tabla:modalidades_virtuales}
+\small
+\begin{tabularx}{\textwidth}{|p{3.2cm}|X|X|}
+\hline
+\rowcolor[gray]{0.9}
+\textbf{Criterio} & \textbf{Modalidad Autogestionada} & \textbf{Modalidad con Acompañamiento} \\
+\hline
+\textbf{Interacción docente} & Asíncrona; materiales y videos preparados previamente por instructores. & Continua; el docente actúa como mentor académico brindando retroalimentación y asesoría. \\
+\hline
+\textbf{Ritmo de avance} & Autónomo e individual, regulado por el participante dentro del periodo de vigencia. & Sincronizado mediante cronograma de entregas, hitos y actividades formativas. \\
+\hline
+\textbf{Sesiones síncronas} & No se contemplan; la interacción es exclusivamente asíncrona. & Opcionales o programadas según el plan curricular, mediante servicios externos de videoconferencia. \\
+\hline
+\textbf{Mecanismos de evaluación} & Cuestionarios formativos y exámenes automatizados por la plataforma. & Evaluaciones automatizadas combinadas, cuando aplique, con revisión docente de evidencias. \\
+\hline
+\textbf{Asistencia} & No aplica; el progreso se fundamenta en módulos acreditados. & Obligatoria únicamente si las políticas del curso establecen un porcentaje mínimo en sesiones vivas. \\
+\hline
+\textbf{Requisitos de acreditación} & Acreditación de evaluaciones y módulos obligatorios del curso. & Acreditación de evaluaciones, cumplimiento de actividades y, en su caso, asistencia requerida. \\
+\hline
+\end{tabularx}
+\end{table}
 
-Donde $m_{i}$ es el orden del bloque de  Jordan asociado al eigenvalor $A$. El siguiente teorema caracteriza las propiedades de estabilidad del origen.
+\section{Gestión de cursos e inscripciones}
+
+La administración de programas educativos virtuales requiere modelar con precisión las relaciones jerárquicas y temporales que articulan la oferta formativa. Desde una perspectiva conceptual, el sistema establece una diferenciación clara entre cinco niveles organizativos:
+
+\begin{enumerate}
+    \item \textbf{Categoría:} Agrupación temática que clasifica las áreas del conocimiento o líneas de especialización formativa ofrecidas por la institución (por ejemplo, ofimática, tecnologías de la información o administración).
+    \item \textbf{Curso:} Entidad base que encapsula el plan de estudios, las competencias deseadas, el temario estructurado, la modalidad pedagógica, los prerrequisitos académicos y los criterios generales de acreditación. Un curso define el \say{qué} de la formación.
+    \item \textbf{Edición:} Instancia temporal o convocatoria periódica de un curso determinado, delimitada por una fecha de inicio, una fecha de término y un periodo específico para la recepción de solicitudes e inscripciones. Una edición contextualiza el curso en el tiempo.
+    \item \textbf{Grupo:} Unidad operativa dentro de una edición a la que se asignan un instructor titular, un horario de referencia cuando corresponda y un número delimitado de cupos máximos para participantes.
+    \item \textbf{Sesión virtual:} Evento formativo calendarizado dentro de un grupo con acompañamiento docente, definido por una fecha, hora de realización y enlace de conexión remota externa.
+\end{enumerate}
+
+Desde el punto de vista del flujo de usuarios, existe una \textbf{distinción fundamental entre el registro en la plataforma y la inscripción a un curso específico}:
+
+\begin{itemize}
+    \item \textbf{Autorregistro de participantes:} Cualquier persona puede crear de manera pública y autónoma una cuenta en Aula Verde proporcionando información básica de contacto (nombre completo, correo electrónico y contraseña). El sistema implementa la verificación obligatoria del correo electrónico para validar la existencia del canal de comunicación y mitigar registros espurios. En el registro general no se exige documentación oficial de identidad (como INE o CURP). Dos participantes pueden compartir el mismo nombre, siendo identificados internamente mediante un identificador único (\textit{User ID}). Es importante señalar que la verificación de correo electrónico valida únicamente el acceso a la cuenta y no constituye una certificación de identidad civil ni impide de forma total la creación de multicuentas. Asimismo, el registro público confiere exclusivamente el rol de participante, sin permitir la selección o autoasignación de roles privilegiados.
+    \item \textbf{Inscripción a un curso:} Crear una cuenta habilita al usuario a explorar el catálogo formativo, pero el ingreso efectivo a un grupo depende de cumplir los requisitos y condiciones particulares del curso deseado.
+\end{itemize}
+
+En cuanto a los \textbf{requisitos académicos}, Aula Verde adopta un modelo flexible: los cursos introductorios o básicos (por ejemplo, \say{Excel básico}) no demandan conocimientos previos ni comprobantes documentales, encontrándose abiertos a cualquier usuario registrado. Por el contrario, los cursos intermedios o avanzados (por ejemplo, \say{Excel intermedio} o \say{Excel avanzado}) pueden definir prerrequisitos académicos en su diseño curricular. El sistema está proyectado para verificar automáticamente si el participante ha acreditado previamente los cursos antecedentes dentro de la misma plataforma; de manera complementaria, cuando el aspirante posea formación externa equivalente, el sistema contempla la posibilidad de adjuntar constancias externas para su validación administrativa por el rol Recepción. La eventual consulta automatizada de cédulas profesionales en registros gubernamentales constituye una consideración de integración futura, no una función disponible o garantizada en el alcance actual.
+
+El control de cupos opera bajo reglas de negocio estrictas para preservar la capacidad de atención docente. El sistema evalúa la disponibilidad de cupos en tiempo real y previene la duplicidad de inscripciones de un mismo participante en la misma edición. Si un grupo alcanza su capacidad máxima, el participante puede ingresar a una \textit{lista de espera} ordenada bajo el principio de atención secuencial (\textit{First-In, First-Out}, FIFO). Ante la cancelación voluntaria de un lugar, el sistema libera la plaza y genera una oferta temporal de cupo con vigencia limitada al primer participante en espera; si la oferta expira sin confirmación, se reasigna automáticamente al siguiente aspirante.
+
+Asimismo, las instituciones pueden definir \textbf{políticas de vigencia de acceso y prórrogas configurables} para sus cursos. En cursos de acceso limitado (por ejemplo, un periodo inicial propuesto de 30 días), el sistema emite avisos previos al vencimiento y permite gestionar prórrogas gratuitas u extensiones voluntarias si la institución lo habilita. Al expirar el plazo de acceso, se suspende la realización de nuevas actividades, pero el historial académico, las calificaciones y el progreso completado se conservan íntegramente en la base de datos, sin generar deudas automáticas, cobros imprevistos ni obligaciones financieras para el participante. En cursos con cuota de recuperación, el estado de inscripción activa se formaliza tras la recepción y validación del comprobante de pago por parte del personal de Recepción.
+
+\section{Arquitectura de aplicaciones web}
+
+\subsection{Arquitectura cliente-servidor}
+
+La arquitectura cliente-servidor constituye el modelo estructural dominante para el desarrollo de sistemas de información distribuidos a través de internet. En este esquema, las tareas se dividen entre los proveedores de recursos o servicios, denominados servidores, y los demandantes de dichos recursos, denominados clientes.
+
+La comunicación se fundamenta en el protocolo de transferencia de hipertexto seguro (HTTPS), gobernado por un ciclo determinista de petición y respuesta (\textit{request-response}). El cliente, generalmente constituido por un navegador web estándar, transmite una solicitud HTTP que especifica una acción mediante un verbo estandarizado (GET, POST, PUT, DELETE), encabezados con información contextual y, en su caso, un cuerpo de datos codificado. El servidor de aplicaciones web procesa la petición aplicando las reglas de cómputo y acceso a bases de datos pertinentes, y genera como respuesta un código de estado numérico acompañado del documento representacional requerido (documentos HTML, hojas de estilo o cargas estructuradas en formato JSON).
+
+\subsection{Patrón Modelo-Vista-Controlador (MVC)}
+
+El patrón arquitectónico Modelo-Vista-Controlador (MVC) propone la separación de las responsabilidades dentro de una aplicación de software en tres capas interconectadas pero desacopladas \cite{sommerville2011software}:
+
+\begin{itemize}
+    \item \textbf{Modelo:} Encapsula la lógica de los datos de la aplicación, el estado y las reglas de validación directa de las entidades de dominio. En sistemas basados en mapeadores objeto-relacionales, el modelo representa tanto la estructura de las tablas de la base de datos como las asociaciones entre ellas.
+    \item \textbf{Vista:} Es responsable de la representación visual de los datos ante el usuario final. Procesa la información suministrada por el controlador y genera la interfaz gráfica interactiva, abstrayéndose por completo de los detalles de almacenamiento o persistencia.
+    \item \textbf{Controlador:} Actúa como intermediario del flujo de ejecución. Recibe las solicitudes HTTP transmitidas por el enrutador del sistema, interpreta la intención del usuario, solicita las modificaciones o consultas pertinentes a los modelos y selecciona la vista adecuada que debe retornarse en la respuesta.
+\end{itemize}
+
+El principio de separación de responsabilidades (\textit{Separation of Concerns}) minimiza el acoplamiento entre la lógica de negocio y los mecanismos de presentación gráfica, facilitando el mantenimiento correctivo y evolutivo del software.
+
+\subsection{Capa de servicios de negocio}
+
+Aunque el patrón MVC clásico brinda una estructura clara, en aplicaciones empresariales complejas es frecuente que los controladores tiendan a sobrecargarse de lógica de negocio transaccional, derivando en el antipatrón conocido como \say{controladores obesos} (\textit{fat controllers}). Para mitigar este problema, la arquitectura del sistema incorpora una \textbf{capa de servicios de negocio} (\textit{Service Layer}) \cite{fowler2002patterns}.
+
+La capa de servicios se sitúa entre los controladores y los modelos de datos, encapsulando las operaciones de dominio que involucran la coordinación de múltiples entidades o la ejecución de reglas de negocio compuestas. Por ejemplo, el proceso de formalización de una inscripción implica verificar la disponibilidad de cupo, validar los prerrequisitos académicos correspondientes, gestionar transaccionalmente el registro en base de datos y activar las alertas de vigencia de acceso. Al confinar esta secuencia dentro de un servicio especializado (por ejemplo, un servicio de inscripciones o un servicio de evaluación), el controlador se limita a validar la solicitud de entrada y delegar la operación al servicio, asegurando la reutilización del código en diferentes interfaces y facilitando la ejecución de pruebas automatizadas independientes.
+
+\subsection{Mecanismos de middleware}
+
+Los mecanismos de \textit{middleware} constituyen una serie de capas o filtros dispuestos a lo largo de la tubería de ejecución (\textit{pipeline}) de las solicitudes HTTP en el servidor web. Todo mensaje entrante debe transitar obligatoriamente a través de estos componentes antes de alcanzar el método correspondiente en el controlador, y las respuestas generadas deben atravesarlos nuevamente antes de ser enviadas al cliente.
+
+El propósito fundamental del middleware es desacoplar tareas transversales o de soporte del flujo operativo directo de los controladores. Entre las operaciones gobernadas por middleware se encuentran:
+
+\begin{itemize}
+    \item La verificación y mantenimiento de sesiones autenticadas de usuario.
+    \item La comprobación de privilegios de acceso y pertenencia institucional.
+    \item La mitigación de vulnerabilidades web mediante la verificación de tokens contra ataques de falsificación de peticiones en sitios cruzados (\textit{Cross-Site Request Forgery}, CSRF).
+    \item La limitación de tasa de solicitudes (\textit{rate limiting}) para prevenir ataques de denegación de servicio y abusos en rutas públicas de registro o autenticación.
+\end{itemize}
+
+En el cuadro \ref{tabla:arquitectura_capas} se sintetizan los componentes de la arquitectura del sistema y sus responsabilidades específicas.
+
+\begin{table}[htbp]
+\centering
+\caption{Componentes de la arquitectura por capas y sus responsabilidades.}
+\label{tabla:arquitectura_capas}
+\small
+\begin{tabularx}{\textwidth}{|p{3.5cm}|X|X|}
+\hline
+\rowcolor[gray]{0.9}
+\textbf{Componente / Capa} & \textbf{Responsabilidad Principal} & \textbf{Tecnología / Mecanismo} \\
+\hline
+\textbf{Capa de Interfaz / Vista} & Renderizado del código HTML interactivo y captura de eventos del usuario. & Plantillas Blade, HTML5, hojas de estilo CSS3 y JavaScript. \\
+\hline
+\textbf{Capa de Middleware} & Filtrado preliminar de peticiones, verificación de tokens CSRF y control de sesión. & Middleware nativo y personalizado de Laravel. \\
+\hline
+\textbf{Capa de Controladores} & Recepción de parámetros HTTP, invocación de servicios y selección de vistas. & Controladores PHP bajo convenciones RESTful. \\
+\hline
+\textbf{Capa de Servicios} & Orquestación de reglas de negocio complejas, prerrequisitos y vigencias. & Clases de servicio PHP inyectadas mediante contenedor de dependencias. \\
+\hline
+\textbf{Capa de Modelos (ORM)} & Definición de esquemas, relaciones entre entidades y persistencia de datos. & Modelos Eloquent ORM con tipado estricto. \\
+\hline
+\textbf{Capa de Persistencia} & Almacenamiento físico relacional e integridad referencial transaccional. & Motor de base de datos MariaDB con tablas transaccionales InnoDB. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\section{Tecnologías de desarrollo web}
+
+La construcción de una plataforma web robusta requiere la articulación de tecnologías especializadas en cada nivel de la pila computacional. A continuación se describe el propósito conceptual y la pertinencia de las tecnologías seleccionadas para el proyecto:
+
+\begin{itemize}
+    \item \textbf{PHP 8.4 como lenguaje de programación del servidor:} PHP es un lenguaje de código abierto interpretado y optimizado para el desarrollo web en el lado del servidor. Su versión 8.4 incorpora un sistema de tipos estricto y expresivo, compilación en tiempo de ejecución (\textit{Just-In-Time}, JIT) mejorada, propiedades de solo lectura asimétricas y optimización en el consumo de memoria, proveyendo un entorno moderno para ejecutar la lógica de la aplicación.
+    \item \textbf{Laravel como framework de aplicaciones web:} Laravel es un marco de trabajo para PHP que implementa una sintaxis expresiva y promueve el uso de patrones de diseño modernos \cite{laravel2026docs}. Provee herramientas integradas para el enrutamiento declarativo, la inyección de dependencias mediante un contenedor de servicios, la ejecución de migraciones de esquemas de datos, la gestión de colas de procesamiento y una capa integrada de pruebas automatizadas, facilitando un desarrollo ordenado y mantenible.
+    \item \textbf{Eloquent como Mapeador Objeto-Relacional (ORM):} Eloquent implementa el patrón de diseño \textit{Active Record}, en el cual cada clase modelo corresponde a una tabla en la base de datos relacional y cada instancia del modelo encapsula una fila de dicha tabla. Permite establecer relaciones estructurales ($1:1$, $1:N$, $N:M$) mediante métodos expresivos en código PHP, evitando la escritura manual de consultas SQL complejas y protegiendo de forma nativa contra inyecciones SQL mediante el uso de sentencias preparadas.
+    \item \textbf{Blade como motor de plantillas:} Blade es el motor de renderizado de vistas propio de Laravel. A diferencia de otros motores que introducen sobrecargas computacionales, Blade compila las directivas a código PHP puro y almacena en caché las vistas procesadas hasta que detecta modificaciones en el código fuente. Brinda soporte nativo para herencia de plantillas maestras (\textit{layouts}), componentes reutilizables y escape automático de caracteres para mitigar vulnerabilidades de inyección de scripts en sitios cruzados (\textit{Cross-Site Scripting}, XSS).
+    \item \textbf{HTML, CSS y JavaScript para la interfaz de usuario:} El Lenguaje de Marcado de Hipertexto (HTML) conforma la estructura semántica de los contenidos en el navegador. Las Hojas de Estilo en Cascada (CSS) administran la estética, el diseño adaptable a diferentes tamaños de pantalla (\textit{responsive design}) y la disposición visual de los elementos. JavaScript actúa en el cliente como lenguaje interpretado para manipular el Modelo de Objetos del Documento (DOM), permitiendo la validación preliminar en formularios y dinamismo asíncrono sin recarga completa de página.
+    \item \textbf{Composer como administrador de dependencias:} Composer es el estándar para la gestión de paquetes y bibliotecas en el ecosistema PHP. Su funcionamiento se basa en la resolución determinista de árboles de dependencias mediante el archivo de manifiesto \texttt{composer.json} y el archivo de bloqueo \texttt{composer.lock}, garantizando que todos los miembros del equipo y los entornos de ejecución controlados utilicen versiones idénticas de los paquetes externos.
+\end{itemize}
+
+\section{Bases de datos relacionales y gestión de transacciones}
+
+\subsection{Modelo relacional y restricciones de integridad}
+
+El modelo relacional, propuesto originariamente por E. F. Codd y formalizado en la literatura de bases de datos \cite{elmasri2016fundamentals}, organiza los datos en tablas compuestas por filas (denominadas formalmente tuplas) y columnas (denominadas atributos). Cada fila representa un registro individual de una entidad, mientras que las columnas definen las propiedades homogéneas de dicha entidad.
+
+Las relaciones entre entidades se modelan mediante el uso de \textbf{claves primarias} (\textit{Primary Keys}, PK), que identifican de forma única a cada registro en su tabla, y \textbf{claves foráneas} (\textit{Foreign Keys}, FK), que hacen referencia a la clave primaria de otra tabla, estableciendo vínculos relacionales con cardinalidades formalizadas: uno a uno ($1:1$), uno a muchos ($1:N$) y muchos a muchos ($N:M$). La restricción de \textbf{integridad referencial} exige que todo valor registrado en una clave foránea exista obligatoriamente en la clave primaria correspondiente o contenga un valor nulo, impidiendo la existencia de registros huérfanos.
+
+Asimismo, el diseño de la base de datos se fundamenta en los principios de \textbf{normalización} (específicamente la Primera, Segunda y Tercera Forma Normal, 3FN). Este procedimiento de descomposición estructurada elimina redundancias innecesarias en los datos y evita anomalías de inserción, actualización o borrado durante la operación rutinaria del sistema. En el contexto de Aula Verde, el esquema de datos debe asegurar la \textbf{preservación histórica del expediente académico}: las calificaciones obtenidas, los intentos de evaluación realizados y las constancias emitidas deben conservarse inalterados aun cuando se actualicen los contenidos didácticos de un curso o se modifiquen las vigencias de acceso.
+
+\subsection{Transacciones y propiedades ACID}
+
+Una transacción en una base de datos es una unidad lógica de ejecución compuesta por una o varias operaciones que deben ejecutarse como un bloque indivisible. Para garantizar la consistencia de la información bajo cualquier circunstancia, el sistema de gestión de base de datos debe cumplir con las propiedades ACID \cite{elmasri2016fundamentals}:
+
+\begin{itemize}
+    \item \textbf{Atomicidad (\textit{Atomicity}):} Garantiza que todas las operaciones que componen la transacción se completen de manera exitosa (\textit{commit}), o en caso de suscitarse algún fallo en cualquiera de sus instrucciones, el sistema revierta por completo todas las modificaciones previas al estado inicial (\textit{rollback}).
+    \item \textbf{Consistencia (\textit{Consistency}):} Asegura que la ejecución de la transacción conduzca a la base de datos desde un estado válido hacia otro estado igualmente válido, respetando las restricciones de integridad y reglas de negocio.
+    \item \textbf{Aislamiento (\textit{Isolation}):} Determina que las transacciones ejecutadas concurrentemente no interfieran entre sí, comportándose como si se estuvieran procesando de manera serial.
+    \item \textbf{Durabilidad (\textit{Durability}):} Certifica que, una vez confirmada la transacción, las modificaciones registradas persistan en el almacenamiento no volátil de forma permanente.
+\end{itemize}
+
+La gestión transaccional resulta indispensable en operaciones críticas, tales como la asignación de cupos en grupos saturados o el registro sincronizado de inscripciones y pagos. Cuando un participante confirma su inscripción, el sistema debe decrementar el contador de cupos y registrar la matrícula simultáneamente; la atomicidad garantiza que no se reduzca el cupo sin haber asentado al participante.
+
+No obstante, es necesario enfatizar que \textbf{la existencia de una transacción no elimina por sí misma todos los problemas de concurrencia}. Si múltiples usuarios intentan inscribirse simultáneamente sobre el último cupo disponible de un grupo, es imperativo configurar niveles de aislamiento adecuados en el motor de base de datos (tales como \textit{Repeatable Read} o \textit{Read Committed}) o emplear técnicas complementarias de bloqueo pesimista (\textit{Pessimistic Locking}) o control optimista de concurrencia (\textit{Optimistic Concurrency Control}), evitando lecturas sucias o actualizaciones perdidas \cite{mariadb2024transactions}. Asimismo, debe destacarse que las pruebas ejecutadas en bases de datos ligeras en memoria (como SQLite) proveen verificación funcional rápida en desarrollo, pero no reproducen de forma automática el comportamiento de concurrencia y bloqueo que experimenta MariaDB bajo múltiples conexiones reales.
+
+\subsection{Sistema Gestor MariaDB}
+
+MariaDB es un sistema gestor de bases de datos relacionales (RDBMS) de código abierto y alto rendimiento, derivado de MySQL. Utiliza por defecto el motor de almacenamiento transaccional InnoDB, el cual brinda soporte completo para transacciones conformes con las propiedades ACID, bloqueos a nivel de fila y comprobación nativa de restricciones de claves foráneas. Su compatibilidad con el ecosistema de Laravel y su capacidad para optimizar índices relacionales lo convierten en el motor idóneo y aprobado para soportar las operaciones de administración académica previstas.
+
+\section{Seguridad, autenticación y autorización}
+
+\subsection{Principios de seguridad y control de acceso}
+
+La seguridad de la información en aplicaciones web tiene como objetivo salvaguardar los activos digitales frente a accesos indebidos, alteraciones no autorizadas y pérdida de disponibilidad. En el contexto de los sistemas de gestión académica, existe una distinción conceptual rigurosa entre dos fases operativas complementarias:
+
+\begin{itemize}
+    \item \textbf{Autenticación (\textit{Authentication}):} Es el procedimiento mediante el cual el sistema verifica la identidad declarada por un usuario. Responde a la interrogante: \textit{¿Es el usuario realmente quien afirma ser?} Se sustenta en credenciales secretas, como la combinación de un correo electrónico verificado y una contraseña criptográfica.
+    \item \textbf{Autorización (\textit{Authorization}):} Es el mecanismo mediante el cual se evalúan los derechos y privilegios concedidos a una identidad previamente autenticada para interactuar con un recurso o ejecutar una acción en el sistema. Responde a la interrogante: \textit{¿Tiene este usuario el permiso requerido para realizar esta operación?}
+\end{itemize}
+
+Es un principio de la ingeniería de seguridad señalar que \textbf{ocultar un botón o elemento visual en la interfaz de usuario no constituye una medida de autorización}. Un usuario con conocimientos básicos puede invocar directamente los puntos finales (\textit{endpoints}) del servidor mediante peticiones HTTP diseñadas externamente. Por consiguiente, los mecanismos de autorización deben verificarse ineludiblemente en el lado del servidor antes de ejecutar cualquier operación en la base de datos.
+
+En el cuadro \ref{tabla:autenticacion_autorizacion} se contrastan las diferencias fundamentales entre autenticación y autorización.
+
+\begin{table}[htbp]
+\centering
+\caption{Comparación conceptual entre autenticación y autorización.}
+\label{tabla:autenticacion_autorizacion}
+\small
+\begin{tabularx}{\textwidth}{|p{3.5cm}|X|X|}
+\hline
+\rowcolor[gray]{0.9}
+\textbf{Característica} & \textbf{Autenticación} & \textbf{Autorización} \\
+\hline
+\textbf{Pregunta clave} & ¿Quién es el usuario? & ¿Qué tiene permitido realizar el usuario? \\
+\hline
+\textbf{Finalidad} & Verificación de la identidad del solicitante. & Regulación y delimitación del acceso a recursos y operaciones. \\
+\hline
+\textbf{Momento de ejecución} & Al inicio de la sesión interactiva del usuario. & En cada petición HTTP individual dirigida a recursos protegidos. \\
+\hline
+\textbf{Mecanismo típico} & Correo verificado, contraseñas hash o tokens temporales. & Políticas de autorización, middleware y roles institucionales (RBAC). \\
+\hline
+\textbf{Consecuencia ante falla} & Denegación de acceso general al sistema (Código HTTP 401). & Restricción de acceso al recurso específico solicitado (Código HTTP 403). \\
+\hline
+\end{tabularx}
+\end{table}
+
+\subsection{Control de acceso basado en roles (RBAC) y contexto institucional}
+
+Para gobernar de manera ordenada la distribución de privilegios, el sistema adopta el modelo de Control de Acceso Basado en Roles (\textit{Role-Based Access Control}, RBAC), estandarizado por el NIST \cite{ferraiolo2001proposed}. En lugar de asignar permisos atómicos individuales a cada cuenta de usuario, los permisos se asignan a roles definidos en la estructura institucional, y los usuarios son asociados a roles específicos.
+
+El sistema delimita cinco roles de operación primordiales:
+
+\begin{enumerate}
+    \item \textbf{Administrador:} Posee control sobre la configuración global del sistema, la administración de instituciones adscritas, la asignación de roles privilegiados y la supervisión de registros de auditoría.
+    \item \textbf{Coordinador:} Responsable de la gestión de la oferta formativa, la creación de cursos, la programación de ediciones, la apertura de grupos y la asignación de instructores.
+    \item \textbf{Recepción:} Personal encargado de revisar solicitudes de inscripción que lo requieran, verificar comprobantes de pago de cursos con cuota, revisar documentación o constancias externas de prerrequisitos cuando corresponda, y brindar atención administrativa a los participantes. No interviene en la aprobación del registro público de cuentas básicas.
+    \item \textbf{Instructor:} Docente titular que actúa como mentor académico en los cursos o grupos asignados, responsable de la publicación de recursos educativos, la conducción de sesiones virtuales, la resolución de dudas, la retroalimentación de actividades y el registro de calificaciones.
+    \item \textbf{Participante:} Usuario que accede mediante autorregistro público, con permisos restringidos a la consulta del catálogo, la inscripción a cursos disponibles, la visualización de materiales, la realización de evaluaciones formativas y finales, y la obtención de constancias académicas.
+\end{enumerate}
+
+El autorregistro público crea exclusivamente cuentas con el rol de participante. Los roles privilegiados (Administrador, Coordinador, Recepción e Instructor) son asignados de forma manual y controlada por personal directivo autorizado. Adicionalmente, el esquema de seguridad incorpora una dimensión de \textbf{autorización por contexto institucional} (aislamiento lógico de datos), asegurando que el personal administrativo únicamente pueda consultar o modificar registros correspondientes a su propia institución, evitando fugas de información entre organizaciones independientes.
+
+\subsection{Almacenamiento criptográfico de credenciales y buenas prácticas}
+
+El almacenamiento de contraseñas de acceso exige el cumplimiento de las recomendaciones internacionales de seguridad de la Fundación OWASP \cite{owasp2026password}. Las contraseñas nunca deben almacenarse en texto plano ni mediante algoritmos reversibles o funciones de resumen obsoletas (como MD5 o SHA-1, vulnerables a colisiones y ataques mediante tablas precalculadas).
+
+El sistema se apoya en funciones de derivación de claves adaptativas con consumo parametrizable de memoria y tiempo, tales como \textit{bcrypt} o \textit{Argon2id}. Estos algoritmos incorporan de manera nativa cadenas aleatorias de sal (\textit{salt}), la cual se concatena a la contraseña antes del proceso de dispersión. Esta técnica asegura que dos usuarios que compartan la misma contraseña posean cadenas hash completamente distintas en la base de datos, neutralizando ataques basados en tablas de arcoíris (\textit{rainbow tables}).
+
+Asimismo, los flujos de restablecimiento de contraseña ante olvido o extravío se ejecutan mediante \textbf{tokens criptográficos temporales} generados de forma pseudoaleatoria y almacenados en su forma hash. Dichos enlaces poseen una vigencia temporal estricta y se invalidan inmediatamente después de su primer uso.
+
+Por último, el sistema implementa \textbf{validación estricta de datos en el servidor} como mecanismo fundamental para asegurar que todos los campos cumplan con formatos, longitudes, rangos y tipados esperados, rechazando peticiones anómalas antes de su procesamiento. Se complementa con la generación de registros de auditoría (\textit{audit logs}) que documentan eventos relevantes del sistema (inicios de sesión, cambios en estados de pago o modificaciones de calificaciones), garantizando la no repudio y facilitando la trazabilidad de operaciones críticas.
+
+\section{Seguimiento y evaluación académica}
+
+\subsection{Fundamentos de evaluación formativa y sumativa}
+
+La pedagogía en entornos virtuales demanda una organización transparente y estructurada tanto de los contenidos instruccionales como de los instrumentos de evaluación del aprendizaje. La literatura pedagógica distingue con claridad entre dos modalidades evaluativas complementarias:
+
+\begin{itemize}
+    \item \textbf{Evaluación formativa:} Posee una finalidad eminentemente pedagógica orientada a regular el proceso de aprendizaje mientras este se desarrolla \cite{black1998assessment}. Su propósito no es asignar una calificación definitiva de aprobación o reprobación, sino proporcionar retroalimentación descriptiva oportuna que permita al participante identificar fortalezas y áreas de mejora \cite{hattie2007feedback}. En Aula Verde, la evaluación formativa se instrumenta mediante \textbf{exámenes de control y cuestionarios de autoevaluación} con intentos ilimitados y retroalimentación inmediata, concebidos como herramientas de estudio y práctica continua.
+    \item \textbf{Evaluación sumativa:} Tiene como objetivo comprobar y certificar el nivel de logro de los objetivos pedagógicos al término de un módulo, bloque temático o curso \cite{bloom1968mastery}. En la plataforma, se concreta a través de \textbf{exámenes finales por módulo} con parámetros formales de configuración (límite de tiempo, calificación mínima aprobatoria y límite de intentos por ciclo) \cite{moodle2026quizsettings}.
+\end{itemize}
+
+\subsection{Aprendizaje para el dominio y ciclos de reforzamiento académico}
+
+El modelo pedagógico del sistema se fundamenta en los principios del \textbf{aprendizaje para el dominio} (\textit{Mastery Learning}) formulados originariamente por Benjamin Bloom \cite{bloom1968mastery}. Bajo este enfoque, la mayoría de los estudiantes pueden alcanzar altos niveles de dominio conceptual si se les brinda el tiempo necesario y las condiciones pedagógicas adecuadas, estructurando la instrucción en unidades modulares secuenciales y proporcionando oportunidades de reforzamiento guiado.
+
+En concordancia con este marco, Aula Verde establece una política de \textbf{ciclos de reforzamiento académico}:
+
+\begin{enumerate}
+    \item Para los exámenes finales de módulo se establece una configuración inicial estándar de tres intentos por ciclo evaluativo, con una calificación mínima aprobatoria definida institucionalmente.
+    \item Si un participante agota los intentos disponibles en un ciclo sin alcanzar la calificación aprobatoria, el sistema no bloquea definitivamente su trayectoria ni cancela su inscripción. En su lugar, activa una fase de reforzamiento académico que exige al estudiante repasar los materiales clave y completar las actividades formativas obligatorias de la unidad correspondiente.
+    \item Una vez completadas satisfactoriamente las actividades de reforzamiento, el sistema habilita un nuevo ciclo de evaluación sobre el módulo pendiente.
+    \item De manera crucial, este proceso conserva íntegramente el historial de intentos y calificaciones anteriores en la base de datos, y bajo ninguna circunstancia revoca o elimina los módulos que el participante ya hubiese acreditado previamente.
+\end{enumerate}
+
+\subsection{El papel del instructor como mentor académico}
+
+En la modalidad acompañada, la interacción pedagógica se sustenta en el modelo de Comunidad de Indagación (\textit{Community of Inquiry}) propuesto por Garrison, Anderson y Archer \cite{garrison2000critical}, el cual destaca la relevancia de la presencia docente (\textit{teaching presence}) para sostener el compromiso y la profundidad crítica en entornos en línea.
+
+El instructor en Aula Verde no se concibe como un mero transmisor de información, sino como un \textbf{mentor académico} cuyas responsabilidades comprenden:
+
+\begin{itemize}
+    \item Publicar guías de estudio, lecturas y lecciones audiovisuales de apoyo.
+    \item Diseñar y calendarizar actividades de aplicación práctica.
+    \item Conducir sesiones virtuales en vivo, clases remotas o conferencias de resolución de dudas mediante servicios externos de videoconferencia.
+    \item Proporcionar retroalimentación formativa cualitativa sobre las evidencias entregadas por los participantes.
+    \item Asentar calificaciones en actividades que demanden valoración humana experta con base en rúbricas institucionales.
+\end{itemize}
+
+\subsection{Versionado de contenidos y criterios de acreditación}
+
+Un desafío recurrente en la gestión de programas de capacitación continua es la actualización de contenidos curriculares. El diseño del sistema prevé que las actualizaciones en los materiales de un curso no deben invalidar automáticamente las acreditaciones históricas obtenidas por participantes en ediciones anteriores. Si una actualización curricular introduce nuevos conocimientos indispensables, el sistema permite diseñar actividades complementarias de nivelación sin vulnerar los registros académicos consolidados.
+
+La acreditación académica representa el reconocimiento formal de que el participante ha satisfecho satisfactoriamente las competencias del curso. Para hacerse acreedor a una \textbf{constancia digital de acreditación}, el participante debe completar todos los módulos obligatorios, alcanzar la calificación mínima aprobatoria en las evaluaciones sumativas y, en los cursos con acompañamiento que lo exijan formalmente, cumplir con el porcentaje de asistencia estipulado para las sesiones síncronas.
+
+Cada constancia digital emitida incorpora un identificador alfanumérico único y un código de verificación que permite corroborar su autenticidad directamente en el portal público de la institución. Es necesario subrayar que estas constancias son de carácter estrictamente institucional o interno de capacitación laboral, sin que deba atribuírseles reconocimiento o validez oficial gubernamental.
+
+\section{Pruebas y aseguramiento de la calidad del software}
+
+La calidad del software se conceptualiza como el grado en que un producto satisface los requisitos funcionales y no funcionales especificados, proporcionando confiabilidad, robustez, eficiencia y mantenibilidad a lo largo de su ciclo de vida \cite{pressman2019software}. La verificación sistemática constituye una práctica medular de la ingeniería de software para prevenir y detectar defectos antes de que el sistema sea puesto en operación.
+
+En el marco de arquitecturas web modernas desarrolladas bajo marcos de trabajo como Laravel, las pruebas automatizadas se estructuran siguiendo una estrategia piramidal que abarca tres niveles complementarios:
+
+\begin{enumerate}
+    \item \textbf{Pruebas unitarias (\textit{Unit Tests}):} Evalúan el comportamiento de unidades individuales y aisladas de código fuente, tales como métodos de cálculo en modelos, transformaciones de datos o algoritmos de validación de reglas de negocio en clases de servicio. Estas pruebas se ejecutan de manera veloz y aíslan dependencias externas mediante objetos simulados (\textit{mocks}).
+    \item \textbf{Pruebas de integración (\textit{Integration Tests}):} Verifican la correcta interacción entre múltiples componentes de software ensamblados, tales como la persistencia efectiva de un modelo Eloquent en la base de datos, el disparo coordinado de eventos de dominio o la correcta ejecución de una transacción multientidad dentro de la capa de servicios.
+    \item \textbf{Pruebas funcionales y de extremo a extremo (\textit{Feature / Functional Tests}):} Validan flujos de negocio completos desde la perspectiva del protocolo HTTP. Simulan el envío de peticiones por parte de un usuario autenticado, transitan por los filtros de middleware y evalúan que la respuesta HTTP contenga el código de estado esperado (ej. 200 OK, 302 Redirect o 403 Forbidden), verificando el cumplimiento de las reglas de negocio, las políticas de prerrequisitos y las restricciones de autorización.
+\end{enumerate}
+
+El framework PHPUnit actúa como el motor de ejecución automatizado de estas suites de prueba. Para asegurar que la ejecución de pruebas no contamine los datos de desarrollo ni dependa de configuraciones manuales volátiles, el sistema utiliza un \textbf{entorno de pruebas aislado}. Si bien la ejecución de pruebas sobre bases de datos efímeras en memoria (como SQLite) provee una comprobación funcional rápida y determinista de la lógica de negocio durante la fase de desarrollo, debe tenerse presente que la validación exhaustiva de la concurrencia real y las transacciones de producción requiere su verificación sobre el motor relacional MariaDB configurado con sus parámetros operativos reales.
+
+En el cuadro \ref{tabla:niveles_pruebas} se contrastan las características de los niveles de pruebas automatizadas adoptados en el aseguramiento de la calidad del sistema.
+
+\begin{table}[htbp]
+\centering
+\caption{Comparación de niveles de pruebas automatizadas de software.}
+\label{tabla:niveles_pruebas}
+\small
+\begin{tabularx}{\textwidth}{|p{3.0cm}|X|X|X|}
+\hline
+\rowcolor[gray]{0.9}
+\textbf{Nivel de Prueba} & \textbf{Objetivo de Verificación} & \textbf{Aislamiento} & \textbf{Velocidad} \\
+\hline
+\textbf{Pruebas Unitarias} & Funciones, métodos específicos y reglas lógicas aisladas. & Total (uso de objetos simulados o \textit{mocks}). & Extremadamente alta (milisegundos). \\
+\hline
+\textbf{Pruebas de Integración} & Comunicación entre servicios, modelos y base de datos. & Parcial (interactúa con esquemas de prueba). & Moderada. \\
+\hline
+\textbf{Pruebas Funcionales} & Flujos HTTP completos, middleware, vigencias y autorización. & Bajo (prueba el ciclo completo de petición y respuesta). & Moderada a lenta. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\section{Despliegue y entornos de ejecución}
+
+El despliegue de software (\textit{software deployment}) abarca el conjunto integrado de actividades requeridas para empaquetar, configurar y poner en operación una aplicación informática en un entorno accesible por sus destinatarios finales. Un principio indispensable de la ingeniería de software es la separación estricta entre el entorno de desarrollo local —donde los programadores construyen y depuran funcionalidades— y el entorno de producción, caracterizado por exigencias rigurosas de seguridad, alta disponibilidad, rendimiento optimizado y resguardo de datos reales.
+
+Para garantizar la consistencia en el comportamiento del sistema a través de los diferentes entornos y erradicar las discrepancias provocadas por variaciones en las versiones del sistema operativo o bibliotecas subyacentes, la arquitectura prevé la utilización de tecnologías de virtualización ligera mediante \textbf{contenedores Docker} \cite{docker2024overview}. Un contenedor encapsula el código fuente de la aplicación, el entorno de ejecución de PHP con sus extensiones compiladas y las configuraciones del servidor en un paquete autosuficiente y portable que comparte el núcleo (\textit{kernel}) del sistema anfitrión, ofreciendo aislamiento seguro sin la sobrecarga computacional de una máquina virtual clásica.
+
+En un entorno de despliegue web moderno, la infraestructura comprende típicamente:
+
+\begin{itemize}
+    \item Un servidor web de alto rendimiento que actúa como proxy inverso (\textit{Reverse Proxy}), responsable de la terminación segura de certificados criptográficos SSL/TLS, compresión de contenidos y despacho estático de archivos CSS, JavaScript e imágenes.
+    \item Un gestor de procesos FastCGI (PHP-FPM) alojado en un contenedor independiente, encargado de recibir las solicitudes dinámicas delegadas por el servidor web y ejecutar el núcleo de la aplicación Laravel.
+    \item Un contenedor o servicio gestionado dedicado al motor de base de datos MariaDB, provisto de volúmenes de almacenamiento persistente no volátil e independientes del ciclo de vida de los contenedores de aplicación. Cualquier propuesta futura para la adopción de motores alternativos (como PostgreSQL) en determinados entornos de nube constituye una decisión técnica pendiente de análisis y aprobación por el equipo de desarrollo, manteniéndose MariaDB como el motor documentado y aprobado en los objetivos del proyecto.
+\end{itemize}
+
+Para la infraestructura de cómputo en la nube, se contempla conceptualmente el aprovechamiento de servidores virtuales escalables (como instancias representativas del tipo Amazon Web Services EC2 u homólogos de otros proveedores de nube). Esta infraestructura permite configurar grupos de seguridad de red con puertos estrictamente delimitados, políticas de respaldo periódico automatizado de la base de datos y esquemas de variables de entorno cifradas, asegurando la disponibilidad continua y la protección de la información del centro formativo.
