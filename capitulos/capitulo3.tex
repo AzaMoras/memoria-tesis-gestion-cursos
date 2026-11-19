@@ -1,2 +1,694 @@
-\chapter{Desarrollo}
-Desarrollo del proyecto, identifica la metodología  Agiles (sea SCRUM, KABAN, etc. )describe cada una de las fases del proceso de desarrollo de su proyecto. 
+\chapter{Desarrollo del Proyecto}
+\label{cap:desarrollo}
+
+El presente capítulo expone de manera detallada, cronológica y técnicamente fundamentada el proceso de desarrollo de \say{Aula Verde: Sistema de Gestión de Cursos e Inscripciones en Línea}. A lo largo de las siguientes secciones se documentan los procedimientos de organización del equipo, la especificación y evolución de los requerimientos, el diseño arquitectónico y de persistencia de datos, la implementación del backend y del frontend, las directrices de seguridad, las prácticas de aseguramiento de la calidad mediante pruebas automatizadas y la preparación de los entornos de ejecución reproducibles mediante tecnologías de virtualización en contenedores.
+
+En concordancia con los principios metodológicos de la ingeniería de software, se describe la trayectoria real del proyecto diferenciando rigurosamente entre los componentes concluidos y comprobados empíricamente, aquellos en fase de desarrollo o prototipado funcional, y las decisiones aprobadas pendientes de implementación.
+
+\section{Metodología de desarrollo}
+\label{sec:metodologia}
+
+\subsection{Selección del enfoque metodológico}
+\label{sec:seleccion_metodologica}
+
+Para la construcción de Aula Verde se seleccionó un enfoque de \textbf{desarrollo iterativo e incremental mediante prácticas ágiles adaptadas del marco de trabajo Scrum}. La naturaleza de una plataforma orientada a la gestión académica y administrativa —donde conviven múltiples perfiles de usuario, flujos transaccionales y requerimientos regulatorios cambiantes— desaconseja el uso de modelos secuenciales rígidos en cascada, en los cuales cualquier retroalimentación tardía demandaría costosas reestructuraciones del código base \cite{sommerville2011software}.
+
+El marco de trabajo Scrum, propuesto y formalizado por Ken Schwaber y Jeff Sutherland \cite{schwaber2020scrum}, se fundamenta en el empirismo y en el pensamiento esbelto (\textit{lean thinking}), sosteniendo que el conocimiento procede de la experiencia y de la toma de decisiones basada en lo observado. Scrum define formalmente un conjunto estructurado de roles (Product Owner, Scrum Master y Desarrolladores), eventos con límites estrictos de tiempo (\textit{Sprint Planning}, \textit{Daily Scrum}, \textit{Sprint Review} y \textit{Sprint Retrospective}) y artefactos específicos (\textit{Product Backlog}, \textit{Sprint Backlog} e \textit{Increment}), cohesionados por la Definición de Terminado (\textit{Definition of Done}) y orientados a la entrega de valor en ciclos fijos de una a cuatro semanas.
+
+Desde una perspectiva de honestidad y rigor académico, es imprescindible precisar que el equipo de trabajo \textbf{no aplicó Scrum de manera formal, estricta o canónica}. En el contexto de un proyecto universitario de titulación, integrado por tres desarrolladores y sujeto a calendarios lectivos e indicaciones docentes periódicas, no resultó viable ni pertinente reproducir la estructura corporativa de la guía oficial. En particular, dentro del equipo:
+\begin{itemize}
+    \item No existió un Product Owner formal con dedicación de negocio exclusiva, asumiendo el equipo de forma compartida la interpretación de los requerimientos a partir de los lineamientos del profesor asesor.
+    \item No se designó un Scrum Master certificado a tiempo completo, alternándose las funciones de facilitación técnica entre los propios integrantes.
+    \item No se celebraron reuniones diarias de sincronización (\textit{Daily Scrum}) con restricción temporal estricta de 15 minutos; la comunicación se mantuvo continua mediante canales digitales y sesiones presenciales coordinadas según la disponibilidad académica.
+    \item No se emplearon estimaciones en puntos de historia ni métricas formales de velocidad del equipo (\textit{velocity}) o gráficos de descenso de trabajo (\textit{burndown charts}) ficticios.
+    \item No se formalizaron tableros Kanban ni actas burocráticas previas que no correspondieran a la realidad operativa del trabajo.
+\end{itemize}
+
+Por consiguiente, la metodología adoptada se define como una \textbf{adaptación pragmática de principios ágiles}, aprovechando los conceptos de descomposición modular, inspección periódica y refinamiento continuo del software en ciclos manejables, alineados con el cronograma y las revisiones académicas.
+
+\subsection{Prácticas ágiles adaptadas}
+\label{sec:practicas_adaptadas}
+
+Las prácticas ágiles que el equipo incorporó de forma natural y efectiva en la dinámica de trabajo fueron las siguientes:
+
+\begin{enumerate}
+    \item \textbf{Planificación de actividades basada en prioridades:} Se articuló el cronograma académico general provisto por el profesor asesor con una lista técnica de tareas priorizadas. La atención se concentró inicialmente en la solidez del núcleo de datos, las restricciones de integridad y las reglas de negocio esenciales, postergando aspectos estéticos no prioritarios.
+    \item \textbf{Ciclos de desarrollo orientados a incrementos:} El trabajo se organizó en periodos breves (de una a dos semanas), en los cuales se abordaban objetivos acotados (por ejemplo, el diseño del esquema relacional, la implementación de un servicio de negocio o el desarrollo de vistas Blade reutilizables), garantizando que cada etapa aportara código ejecutable y verificable.
+    \item \textbf{Comunicación continua y coordinación técnica:} Los integrantes mantuvieron canales abiertos para discutir dificultades arquitectónicas, resolver ambigüedades en las reglas de operación y acordar convenciones de código sin necesidad de ceremonias burocráticas obligatorias.
+    \item \textbf{Revisión y verificación de incrementos:} Al finalizar cada módulo o servicio, el código se sometió a pruebas automatizadas y validación manual antes de considerarlo integrado, garantizando que el incremento satisficiera los criterios de calidad acordados.
+    \item \textbf{Retroalimentación y adaptación docente:} Las revisiones y observaciones emitidas por el profesor Mandujano en las sesiones de seguimiento se utilizaron como disparadores para ajustar decisiones técnicas y de producto sin reiniciar el proyecto, tal como ocurrió con la confirmación de la modalidad 100\,\% virtual y la eliminación de conceptos presenciales.
+    \item \textbf{Refactorización y mejora continua:} Tras completar una fase, se examinaron las deficiencias detectadas (como el manejo de concurrencia en la asignación de cupos o el desacoplamiento de consultas complejas) para refactorizar el código antes de iniciar el siguiente componente.
+\end{enumerate}
+
+\subsection{Organización y responsabilidades del equipo}
+\label{sec:organizacion_equipo}
+
+El equipo de desarrollo estuvo conformado por tres integrantes, cuyas responsabilidades se distribuyeron de manera colaborativa y complementaria:
+
+\begin{itemize}
+    \item \textbf{Arturo Azael Morales García:} Coordinación de la arquitectura del backend, modelado relacional y migraciones de base de datos, diseño de la capa de servicios transaccionales, configuración de la suite de pruebas con PHPUnit y administración del repositorio en GitHub.
+    \item \textbf{Perla Esmeralda Gonzalez Zavala:} Análisis de requerimientos funcionales, modelado de reglas de negocio académicas y de evaluación, diseño y estructuración de plantillas Blade reutilizables y redacción técnica de la documentación académica en LaTeX.
+    \item \textbf{Marco Isbén Castañeda García:} Desarrollo y maquetación de interfaces de usuario bajo los estándares visuales de Aula Verde, integración de componentes CSS/SVG, implementación de verificaciones en middleware y pruebas de cobertura funcional.
+\end{itemize}
+
+El control de versiones se coordinó a través de la plataforma GitHub mediante ramas temáticas (\textit{feature branches}) y solicitudes de extracción (\textit{pull requests}), asegurando que los cambios no interfirieran con el estado estable de la rama principal (\texttt{main}).
+
+\subsection{Planificación mediante el cronograma académico}
+\label{sec:cronograma_academico}
+
+La construcción del sistema se articuló en torno a las etapas establecidas en el cronograma académico coordinado por el profesor Mandujano, complementado con el plan de desarrollo técnico formulado por el equipo. A partir de los registros y documentos disponibles en el proyecto (\texttt{docs/PLAN\_NOVIEMBRE\_2026.md}, \texttt{docs/DECISIONES\_TECNICAS.md} y \texttt{docs/FLUJO\_DESARROLLO.md}), en el cuadro \ref{tabla:cronograma_desarrollo} se sistematiza la correspondencia entre los periodos planificados, el trabajo efectivamente realizado y las evidencias técnicas generadas.
+
+\begin{table}[htbp]
+\centering
+\caption{Cronograma de desarrollo: actividades planificadas, trabajo realizado y evidencias.}
+\label{tabla:cronograma_desarrollo}
+\small
+\begin{tabularx}{\textwidth}{|p{2.6cm}|p{3.8cm}|X|p{3.2cm}|}
+\hline
+\rowcolor[gray]{0.9}
+\textbf{Periodo} & \textbf{Actividad Planificada} & \textbf{Trabajo Realizado} & \textbf{Evidencia / Resultado} \\
+\hline
+26 oct 2026 & Definición inicial del esquema relacional y modelos. & Modelado de 32 entidades de negocio, creación de migraciones Laravel y definición de restricciones de integridad referencial. & 35 migraciones de base de datos y 32 clases de modelos Eloquent. \\
+\hline
+05 -- 06 nov 2026 & Auditoría de arquitectura y delimitación de modalidad. & Confirmación del alcance exclusivamente virtual (100\,\% virtual); depuración del catálogo descartando salones físicos e inventario presencial. & Archivos de contexto (\texttt{CONTEXTO\_PROYECTO.md}, \texttt{DECISIONES\_TECNICAS.md}). \\
+\hline
+09 nov 2026 & Desarrollo de interfaz pública y presentación institucional. & Construcción de la landing page pública en Blade, estructuración de secciones informativas, integración de la paleta cromática verde e iconografía SVG. & Vista \texttt{resources/views/}\break\texttt{publico/inicio.blade.php} y layouts base. \\
+\hline
+10 -- 11 nov 2026 & Arquitectura de seguridad, roles y contexto institucional. & Creación del middleware de autenticación y autorización por roles/permisos; desarrollo del servicio de autorización por institución (\texttt{AutorizacionInstitucional}). & Clases en \texttt{app/Http/}\break\texttt{Middleware/} y pruebas de aislamiento de cuentas. \\
+\hline
+12 -- 13 nov 2026 & Diseño de la capa de servicios y prototipos de catálogo. & Implementación de \texttt{SolicitudRegistroService} y \texttt{InscripcionService}; maquetación de prototipos de catálogo y portales de usuario. & Clases en \texttt{app/Services/} y rutas demo en \texttt{routes/}\break\texttt{tesis\_vistas\_demo.php}. \\
+\hline
+14 -- 16 nov 2026 & Transacciones de inscripción, cupos y pruebas de servicios. & Implementación de transacciones atómicas con \texttt{lockForUpdate()} para evitar sobrecupo; creación de la suite de pruebas unitarias y de integración. & 113 pruebas aprobadas con 353 aserciones en entorno aislado SQLite. \\
+\hline
+17 -- 18 nov 2026 & Servicios de evaluación, pagos y elegibilidad de constancias. & Construcción de \texttt{EvaluacionService}, \texttt{PagoService} y \texttt{ConstanciaService}; cálculo exacto de importes en centavos enteros para evitar errores flotantes. & Clases de servicio de soporte (\texttt{Importes}, \texttt{ReglasOperacion}) y pruebas. \\
+\hline
+19 nov 2026 en adelante & Documentación en LaTeX y especificación de despliegue. & Redacción técnica formal del Capítulo 3 de la Memoria en LaTeX; revisión de especificaciones para contenedores Docker. & Capítulos compilados en \texttt{Proeycto.pdf} y referencias verificadas. \\
+\hline
+\end{tabularx}
+\end{table}
+
+El análisis comparativo entre lo planificado y lo ejecutado evidencia que el equipo priorizó la robustez de las reglas transaccionales del backend y la cobertura de pruebas de negocio por encima de la proliferación de interfaces gráficas secundarias. Asimismo, se presentó una reprogramación formal el 5 de noviembre de 2026, fecha en la que se descartaron formalmente los requerimientos heredados sobre sedes físicas, aulas y préstamos de equipo, reorientando todo el esfuerzo hacia los dos modelos de formación virtual (autogestionada y acompañada).
+
+\subsection{Revisiones, incrementos y mejora continua}
+\label{sec:revisiones_mejora}
+
+La adopción de ciclos cortos facilitó la absorción de modificaciones funcionales sin generar disrupciones críticas en el avance global. El ejemplo más representativo fue la reestructuración de la política de acceso de usuarios: mientras que la versión inicial contemplaba un flujo burocrático en el cual cualquier aspirante debía enviar una solicitud administrativa para que el Administrador creara manualmente su cuenta, las revisiones docentes orientaron la conveniencia de adoptar un \textbf{autorregistro público directo para participantes} con datos básicos de contacto y verificación de correo electrónico.
+
+Gracias a la modularidad provista por la arquitectura por capas, este ajuste no invalidó la lógica desarrollada: el servicio \texttt{SolicitudRegistroService} permaneció como mecanismo riguroso para la provisión administrativa controlada, mientras que se proyectó la incorporación de rutas de autorregistro público directo sin alterar el esquema relacional subyacente. De manera análoga, en el subsistema de evaluaciones, el análisis de las políticas de reforzamiento académico permitió desacoplar la calificación técnica de entregas del orquestador de ciclos pedagógicos, demostrando la flexibilidad del enfoque iterativo.
+
+\section{Análisis y especificación de requisitos}
+\label{sec:requisitos}
+
+\subsection{Problema general que atiende Aula Verde}
+\label{sec:problema_general}
+
+Las pequeñas instituciones educativas privadas y los centros de capacitación técnica continua suelen enfrentar severas limitaciones organizativas derivadas de la dispersión de sus herramientas operativas. Con frecuencia, estas entidades gestionan la difusión de sus convocatorias mediante redes sociales, reciben solicitudes de inscripción por mensajería instantánea, concilian comprobantes de pago mediante hojas de cálculo manuales y distribuyen materiales didácticos a través de enlaces informales de almacenamiento en la nube.
+
+Esta carencia de centralización ocasiona problemas recurrentes:
+\begin{itemize}
+    \item Falta de control en tiempo real sobre los cupos disponibles en grupos virtuales, derivando en sobrecupos accidentales o plazas vacantes desaprovechadas.
+    \item Imposibilidad de gestionar listas de espera transparentes con ofertas de cupo automáticas ante cancelaciones voluntarias.
+    \item Dificultad para verificar el cumplimiento estricto de prerrequisitos académicos en cursos avanzados.
+    \item Inconsistencias en el seguimiento pedagógico y desarticulación entre las evaluaciones formativas continuas y los exámenes sumativos finales.
+    \item Riesgos en la confidencialidad e integridad de la información sensible y académica de los participantes.
+\end{itemize}
+
+Aula Verde atiende directamente esta problemática mediante un sistema de información web centralizado, gobernado por reglas de negocio consistentes, control transaccional estricto y una clara separación de responsabilidades institucionales.
+
+\subsection{Identificación de actores del sistema}
+\label{sec:actores_sistema}
+
+El sistema delimita cinco roles de usuario fundamentales, cada uno asociado a un conjunto formal de facultades y restricciones operativas dentro del ámbito de su institución adscrita:
+
+\begin{enumerate}
+    \item \textbf{Administrador:} Responsable de la gobernanza global del sistema. Administra los registros institucionales, supervisa las bitácoras de auditoría, gestiona las cuentas de usuarios con privilegios elevados y asigna roles y permisos institucionales. No interviene de manera ordinaria en la docencia ni en la calificación de alumnos.
+    \item \textbf{Coordinador:} Encargado de la gestión académica de la oferta formativa. Administra las categorías temáticas, los cursos base, las ediciones temporales, los grupos operativos, la asignación de instructores titulares y la definición de módulos y actividades de aprendizaje.
+    \item \textbf{Recepción:} Personal operativo administrativo encargado de la atención de solicitudes de ingreso, la revisión y validación de evidencias documentales de prerrequisitos académicos para cursos avanzados, y la verificación manual y conciliación de comprobantes de pago bancarios en cursos con cuota de recuperación. No interviene en la aprobación del registro público básico de participantes.
+    \item \textbf{Instructor:} Docente titular que actúa como mentor académico en los grupos que tiene asignados formalmente. Publica materiales instruccionales, calendariza sesiones virtuales sincrónicas en cursos acompañados, retroalimenta evidencias de aprendizaje y asienta calificaciones manuales conforme a las rúbricas institucionales.
+    \item \textbf{Participante:} Usuario final que se incorpora a la plataforma mediante autorregistro público. Consulta el catálogo de cursos, solicita inscripciones a grupos disponibles, atiende los contenidos modulares, presenta cuestionarios y evaluaciones, realiza entregas de evidencias y descarga las constancias digitales emitidas al acreditar satisfactoriamente un curso.
+\end{enumerate}
+
+\subsection{Requisitos funcionales}
+\label{sec:requisitos_funcionales}
+
+Los requerimientos funcionales especifican las acciones, comportamientos y transformaciones de datos que el sistema debe ejecutar. En el cuadro \ref{tabla:requisitos_funcionales} se sintetizan los principales requisitos funcionales organizados por subsistema.
+
+\begin{table}[htbp]
+\centering
+\caption{Requisitos funcionales principales del sistema Aula Verde.}
+\label{tabla:requisitos_funcionales}
+\small
+\begin{tabularx}{\textwidth}{|p{2.0cm}|p{3.8cm}|X|p{2.2cm}|}
+\hline
+\rowcolor[gray]{0.9}
+\textbf{Código} & \textbf{Nombre} & \textbf{Descripción del Requisito} & \textbf{Actor Principal} \\
+\hline
+RF-01 & Autorregistro de participantes & Permitir el registro público directo de participantes proporcionando nombre, correo electrónico y contraseña, enviando enlace de verificación de correo. & Participante \\
+\hline
+RF-02 & Gestión de sesiones y credenciales & Autenticar usuarios mediante correo y contraseña hash (Bcrypt), controlar estados de cuenta (activa, pendiente, inactiva) y proveer restablecimiento por token temporal. & Todos \\
+\hline
+RF-03 & Control de acceso por roles (RBAC) & Restringir el acceso a rutas, operaciones y datos según el rol, los permisos atómicos y la institución adscrita del usuario autenticado. & Administrador \\
+\hline
+RF-04 & Catálogo de oferta formativa & Publicar categorías, cursos, modalidades virtuales, temarios, requisitos y fechas de edición, permitiendo búsquedas y filtros por área temática. & Todos (Público) \\
+\hline
+RF-05 & Administración de oferta curricular & Registrar y editar cursos, ediciones y grupos operativos, asignando cupo máximo, fechas de inicio y cierre de inscripción, y precio. & Coordinador \\
+\hline
+RF-06 & Asignación de instructores & Asignar instructores titulares a grupos de cursos acompañados, verificando la ausencia de traslapes en horarios de sesiones virtuales sincrónicas. & Coordinador \\
+\hline
+RF-07 & Solicitud de inscripción & Gestionar la solicitud de inscripción de un participante a un grupo, validando apertura, unicidad, cupo disponible y cumplimiento de prerrequisitos. & Participante \\
+\hline
+RF-08 & Control transaccional de cupos & Reservar cupo de forma atómica ante solicitudes concurrentes, generando reservas temporales con fecha de vencimiento (\texttt{reserva\_vence\_at}). & Sistema \\
+\hline
+RF-09 & Lista de espera secuencial & Incorporar a los aspirantes a una lista de espera ordenada (FIFO) cuando el grupo alcance su capacidad máxima, emitiendo ofertas temporales ante cancelaciones. & Participante, Sistema \\
+\hline
+RF-10 & Registro y verificación de pagos & Registrar comprobantes de pago de participantes para cursos con costo y habilitar al rol Recepción para su revisión, conciliación y confirmación definitiva. & Participante, Recepción \\
+\hline
+RF-11 & Contenidos y módulos formativos & Organizar la trayectoria pedagógica en módulos secuenciales, integrando recursos multimedia, lecturas descargables y actividades evaluables. & Coordinador, Instructor \\
+\hline
+RF-12 & Evaluaciones formativas y sumativas & Proveer cuestionarios formativos con intentos ilimitados y retroalimentación inmediata, y exámenes sumativos de módulo con intentos configurables. & Participante, Instructor \\
+\hline
+RF-13 & Emisión y verificación de constancias & Comprobar la elegibilidad de acreditación y emitir constancias digitales con identificador único institucional y código de verificación pública. & Recepción, Participante \\
+\hline
+RF-14 & Registro de auditoría & Registrar en bitácora inmutable las operaciones críticas (altas de cuentas, confirmación de pagos, cancelaciones, calificaciones). & Sistema \\
+\hline
+\end{tabularx}
+\end{table}
+
+\subsection{Requisitos no funcionales}
+\label{sec:requisitos_no_funcionales}
+
+Los requerimientos no funcionales definen los atributos de calidad, restricciones técnicas y condiciones operativas que debe satisfacer el software:
+
+\begin{enumerate}
+    \item \textbf{Seguridad de la información (RNF-01):} Todas las credenciales de acceso deben almacenarse utilizando funciones hash adaptativas con sal (\textit{salt}) mediante Bcrypt. Las peticiones con verbos de modificación de estado (POST, PUT, DELETE) deben incorporar obligatoriamente tokens CSRF válidos. Los parámetros de entrada deben someterse a validación estricta en el servidor para mitigar inyecciones SQL y ataques XSS.
+    \item \textbf{Aislamiento institucional (RNF-02):} El sistema debe garantizar que los usuarios con roles de gestión (Administrador, Coordinador, Recepción, Instructor) únicamente puedan consultar o modificar entidades pertenecientes a su propia institución, aplicando filtros contextuales rigurosos en cada consulta.
+    \item \textbf{Integridad referencial y consistencia transaccional (RNF-03):} El almacenamiento de datos debe salvaguardar las propiedades ACID. Las operaciones de reserva de cupo, confirmación de inscripción y conciliación de pagos deben ejecutarse dentro de transacciones de base de datos con políticas de bloqueo pesimista a nivel de fila (\texttt{lockForUpdate()}) y protección contra interbloqueos (\textit{deadlocks}).
+    \item \textbf{Mantenibilidad y desacoplamiento (RNF-04):} La arquitectura debe respetar el patrón Modelo-Vista-Controlador complementado con una capa de servicios de dominio, desacoplando la lógica de negocio de los controladores HTTP y las vistas Blade.
+    \item \textbf{Compatibilidad y diseño adaptable (RNF-05):} La interfaz de usuario debe ser responsiva (\textit{responsive design}), ofreciendo visualización clara y usabilidad consistente en dispositivos móviles, tabletas y computadoras de escritorio, garantizando contrastes accesibles y soporte para modo claro y oscuro.
+    \item \textbf{Trazabilidad y persistencia histórica (RNF-06):} El expediente académico de los participantes (calificaciones, entregas, intentos de evaluación y constancias emitidas) debe preservarse de forma inalterable en el tiempo mediante técnicas de borrado lógico (\textit{soft deletes}), impidiendo eliminaciones físicas accidentales.
+\end{enumerate}
+
+\subsection{Definición y evolución de las reglas de negocio}
+\label{sec:evolucion_reglas}
+
+Durante el ciclo de vida del proyecto, diversas decisiones funcionales y de arquitectura experimentaron ajustes orientados a mejorar la experiencia del usuario y optimizar la viabilidad técnica. En el cuadro \ref{tabla:evolucion_decisiones} se contrasta la formulación inicial de dichas decisiones frente a su versión definitiva aprobada y su correspondiente estado de avance en el repositorio.
+
+\begin{table}[htbp]
+\centering
+\caption{Evolución de decisiones de diseño y estado de implementación en Aula Verde.}
+\label{tabla:evolucion_decisiones}
+\small
+\begin{tabularx}{\textwidth}{|p{2.8cm}|p{3.5cm}|X|p{2.6cm}|}
+\hline
+\rowcolor[gray]{0.9}
+\textbf{Área Funcional} & \textbf{Decisión Inicial} & \textbf{Modificación Aprobada} & \textbf{Estado Verificado en Repositorio} \\
+\hline
+Registro de participantes & Solicitud pública con envío de documentos y aprobación manual obligatoria por el Administrador antes de crear cualquier cuenta. & Autorregistro público directo con información básica (nombre, correo y contraseña) y verificación de correo; la revisión administrativa se reserva para prerrequisitos y pagos. & Lógica de validación administrativa implementada en \texttt{SolicitudRegistroService}; autorregistro público directo proyectado para controladores finales. \\
+\hline
+Documentación de identidad & Solicitud obligatoria generalizada de identificaciones oficiales (INE, CURP) para el registro en la plataforma. & Supresión de INE/CURP como requisito general; el registro exige únicamente datos de contacto para reducir fricciones y salvaguardar datos personales. & Verificado en modelos: la tabla \texttt{users} no exige documentos oficiales para la cuenta de usuario. \\
+\hline
+Prerrequisitos académicos & Requisitos homogéneos y genéricos aplicados indistintamente a todos los cursos del catálogo. & Prerrequisitos curriculares por curso: cursos básicos abiertos sin requisitos; cursos avanzados con verificación automática interna o validación manual externa en Recepción. & Modelado relacional implementado en \texttt{cursos}, \texttt{requisitos} y \texttt{curso\_requisito}; validación en \texttt{InscripcionService}. \\
+\hline
+Vigencia y prórrogas & Acceso indefinido a las aulas virtuales tras confirmar la matrícula. & Vigencias de acceso temporales configurables (propuesta base de 30 días), alertas previas y prórrogas; conservación del avance histórico sin cobros imprevistos. & Campo \texttt{reserva\_vence\_at} implementado en \texttt{inscripciones}; políticas de prórrogas definidas lógicamente, pendientes de tabla dedicada. \\
+\hline
+Estructura evaluativa & Cuestionarios homogéneos sin diferenciación entre práctica y acreditación formal. & Modelo dual: evaluaciones formativas con intentos ilimitados y retroalimentación inmediata; evaluaciones sumativas de módulo con intentos configurables y calificación mínima. & Entidades \texttt{actividades}, \texttt{entregas} y \texttt{evaluaciones} creadas; lógica de calificación implementada en \texttt{EvaluacionService}. \\
+\hline
+Recuperación académica & Bloqueo permanente o reprobación definitiva al agotar los intentos en un examen. & Ciclos de reforzamiento académico que habilitan nuevos intentos tras completar actividades de repaso, conservando siempre los módulos acreditados. & Especificación formalizada; lógica de reforzamiento modular pendiente de orquestador avanzado. \\
+\hline
+Rol del instructor & Instructor como evaluador administrativo de calificaciones. & Instructor como mentor académico que guía el aprendizaje, brinda retroalimentación cualitativa y conduce sesiones virtuales sincrónicas. & Modelos \texttt{instructores} y \texttt{grupo\_instructor} creados; verificación de titularidad implementada en servicios. \\
+\hline
+Preservación histórica & Posible reinicio de asignaturas ante modificaciones en contenidos. & Conservación histórica irreversible del progreso completado, intentos y constancias emitidas en la base de datos relacional. & Restricciones \texttt{restrictOnDelete} y borrado lógico mediante \texttt{SoftDeletes} y \texttt{bitacora}. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\section{Diseño de la arquitectura del sistema}
+\label{sec:arquitectura_sistema}
+
+\subsection{Patrón MVC y capa de servicios de negocio}
+\label{sec:mvc_servicios}
+
+La estructura del código fuente de Aula Verde se diseñó bajo una especialización del patrón Modelo-Vista-Controlador (MVC), incorporando una \textbf{capa de servicios de negocio} (\textit{Service Layer}) como intermediaria entre los controladores web y los modelos de persistencia Eloquent \cite{fowler2002patterns}.
+
+En el esquema MVC tradicional de Laravel, es común que las reglas transaccionales complejas se concentren directamente en los métodos de los controladores. En una aplicación de gestión académica, este enfoque conduce al antipatrón de \say{controladores obesos} (\textit{fat controllers}), donde un solo método debe coordinar la autenticación del usuario, la comprobación de vigencias, la validación de cupos con bloqueos concurrentes, el cálculo de importes y el registro de bitácoras de auditoría. La sobrecarga resultante degrada la legibilidad del código, dificulta las pruebas unitarias y genera duplicidad de lógica cuando una misma operación debe invocarse desde diferentes puntos finales HTTP o comandos de consola.
+
+Para solucionar este desafío, Aula Verde distribuye las responsabilidades en capas claramente delimitadas:
+\begin{enumerate}
+    \item \textbf{Capa de Enrutamiento y Middleware:} Filtra las peticiones entrantes en función de la sesión activa, el estado de la cuenta (\texttt{cuenta.activa}), el rol institucional (\texttt{rol}) y los permisos específicos requeridos (\texttt{permiso}), aislando el contexto de la institución.
+    \item \textbf{Capa de Controladores:} Recibe la solicitud HTTP validada, interpreta la intención del usuario y delega inmediatamente la ejecución de la regla de negocio a la clase de servicio correspondiente. Su función se limita a coordinar la llamada y retornar una redirección o una vista con datos.
+    \item \textbf{Capa de Servicios de Dominio:} Encapsula íntegramente las transacciones, la orquestación de modelos, el cálculo aritmético exacto, la gestión de bloqueos de concurrencia y el registro de eventos en la bitácora de auditoría.
+    \item \textbf{Capa de Modelos Eloquent (ORM):} Define las estructuras de las entidades, las relaciones objeto-relacionales, los modificadores de atributos y las restricciones de consulta.
+    \item \textbf{Capa de Persistencia:} Gestiona el almacenamiento relacional físico en tablas InnoDB de MariaDB con soporte ACID.
+    \item \textbf{Capa de Vistas Blade:} Renderiza las interfaces semánticas reutilizables consumiendo los datos proporcionados por los controladores.
+\end{enumerate}
+
+\subsection{Relación e interacción entre componentes}
+\label{sec:interaccion_componentes}
+
+El flujo operativo integral de una solicitud típica dentro del sistema —como el proceso de confirmación de una inscripción con reserva de cupo— se ilustra conceptualmente en el esquema de la figura \ref{fig:arquitectura_flujo}.
+
+\begin{figure}[htbp]
+\centering
+\small
+\begin{verbatim}
++-------------------------------------------------------------------------+
+|                        Navegador Web / Cliente                          |
++-------------------------------------------------------------------------+
+                                    |  Petición HTTP (POST /inscripciones)
+                                    v
++-------------------------------------------------------------------------+
+|                     Tubería de Middleware (Pipeline)                    |
+|  - Sesión activa / CSRF                                                 |
+|  - CuentaActivaMiddleware (users.estado_cuenta = 'activa')              |
+|  - RolMiddleware (roles.clave in ['participante'])                      |
+|  - Aislamiento institucional (institucion_id contextual)                 |
++-------------------------------------------------------------------------+
+                                    |
+                                    v
++-------------------------------------------------------------------------+
+|                    Controlador (InscripcionController)                  |
+|  - Validación de entrada (Form Request)                                 |
+|  - Invocación de servicio: $inscripcionService->inscribir(...)           |
++-------------------------------------------------------------------------+
+                                    |
+                                    v
++-------------------------------------------------------------------------+
+|                  Capa de Servicios (InscripcionService)                 |
+|  - AutorizacionInstitucional: verifica actor e institución activa       |
+|  - DB::transaction(..., 3): inicio de transacción con reintentos       |
+|  - Comprobación de estado del curso/edición/grupo                       |
+|  - Verificación de requisitos obligatorios validados                    |
+|  - Bloqueo pesimista de cupo: $grupo->inscripciones()->lockForUpdate()  |
+|  - Cálculo de precio con Importes::centavos (entero sin flotantes)      |
+|  - Creación de Inscripcion (estado: pendiente_pago, reserva_vence_at)   |
+|  - Registro en bitácora mediante AuditoriaService                       |
++-------------------------------------------------------------------------+
+                    |                                 |
+                    v                                 v
++-----------------------------------+ +-----------------------------------+
+|     Modelos Eloquent (ORM)        | |      Auditoría / Servicios Soporte  |
+|  - Grupo, Inscripcion, Requisito  | |  - AuditoriaService -> Bitacora    |
+|  - Relaciones y restricciones FK  | |  - ReglasOperacion, Importes       |
++-----------------------------------+ +-----------------------------------+
+                    \                                 /
+                     v                               v
++-------------------------------------------------------------------------+
+|           Base de Datos Relacional MariaDB (Motor InnoDB)                |
+|  - Integridad referencial (restrictOnDelete)                            |
+|  - Nivel de aislamiento transaccional y bloqueos de fila                 |
++-------------------------------------------------------------------------+
+                                    |
+                                    v
++-------------------------------------------------------------------------+
+|                    Capa de Presentación (Vistas Blade)                  |
+|  - Componentes modulares, layouts maestros y respuesta HTTP             |
++-------------------------------------------------------------------------+
+\end{verbatim}
+\caption{Diagrama de arquitectura por capas y flujo transaccional de Aula Verde.}
+\label{fig:arquitectura_flujo}
+\end{figure}
+
+\subsection{Estructura de clases y componentes reales del repositorio}
+\label{sec:clases_reales}
+
+La arquitectura descrita se encuentra respaldada por archivos y clases efectivamente construidos en el repositorio del proyecto:
+
+\begin{itemize}
+    \item \textbf{\texttt{app/Services/InscripcionService.php}:} Orquesta el registro de inscripciones, control de cupos en tiempo real mediante bloqueos pesimistas, cálculo de precios acordados, fechas límite de reserva y confirmación de inscripciones mediante pagos verificados.
+    \item \textbf{\texttt{app/Services/PagoService.php}:} Gestiona el registro de comprobantes de pago de los participantes, referencias únicas bancarias, validación de montos contra el precio de la edición y transiciones de estado de pago.
+    \item \textbf{\texttt{app/Services/EvaluacionService.php}:} Implementa el asentamiento de calificaciones manuales por parte del instructor asignado, control de puntajes máximos en centavos enteros, validación de fechas de entrega respecto a la inscripción y verificación de número de intentos.
+    \item \textbf{\texttt{app/Services/ConstanciaService.php}:} Provee el diagnóstico analítico de elegibilidad para la obtención de constancias digitales institucionales, evaluando calificaciones de actividades y porcentajes de asistencia antes de cualquier emisión.
+    \item \textbf{\texttt{app/Services/SolicitudRegistroService.php}:} Administra el flujo de recepción y aprobación administrativa de solicitudes de registro, vinculación de participantes y provisión controlada de cuentas.
+    \item \textbf{\texttt{app/Services/Soporte/AutorizacionInstitucional.php}:} Clase especializada que centraliza la comprobación de pertenencia institucional, recargando las entidades directamente desde la base de datos para neutralizar ataques basados en manipulación de atributos o estados cacheados.
+    \item \textbf{\texttt{app/Services/Soporte/AuditoriaService.php}:} Registra eventos críticos en la tabla \texttt{bitacora}, participando de forma atómica en las mismas transacciones de los servicios de negocio.
+    \item \textbf{\texttt{app/Services/Soporte/Importes.php}:} Utilidad aritmética para manipular importes monetarios y calificaciones en enteros de centavos, neutralizando los errores de imprecisión propios de los números de coma flotante (\textit{floating-point}).
+    \item \textbf{\texttt{app/Services/Soporte/ReglasOperacion.php}:} Encapsula los estados válidos de las entidades y las políticas operativas configurables del sistema.
+\end{itemize}
+
+Es importante enfatizar el estado real de integración: las clases de servicio mencionadas se encuentran completamente codificadas y validadas mediante pruebas de integración exhaustivas; sin embargo, su vinculación definitiva con los controladores HTTP finales y formularios web interactivos se encuentra en proceso de integración sistemática.
+
+\section{Diseño e implementación de la base de datos}
+\label{sec:base_datos}
+
+\subsection{Identificación de entidades y modelo relacional}
+\label{sec:entidades_modelo}
+
+El modelado conceptual de Aula Verde se estructuró para soportar la totalidad de las operaciones académicas y administrativas de centros de formación virtual. El esquema comprende un total de \textbf{32 entidades de negocio específicas}, a las que se suman las 3 tablas base provistas por el framework Laravel (\texttt{users}, \texttt{cache} y \texttt{jobs}), totalizando \textbf{35 archivos de migración} ordenados cronológicamente.
+
+Las 32 entidades de negocio se organizan en los siguientes conglomerados temáticos:
+\begin{enumerate}
+    \item \textbf{Administración y estructura institucional:} \texttt{instituciones}, \texttt{sedes} (metadatos administrativos de infraestructura), \texttt{bitacora} e \texttt{inactivos}.
+    \item \textbf{Cuentas, roles y permisos:} \texttt{roles}, \texttt{permisos}, \texttt{usuario\_rol}, \texttt{rol\_permiso}, \texttt{solicitudes\_registro} y \texttt{documentos\_solicitud}.
+    \item \textbf{Actores educativos:} \texttt{participantes}, \texttt{instructores} y \texttt{grupo\_instructor}.
+    \item \textbf{Oferta formativa y convocatorias:} \texttt{categorias\_curso}, \texttt{cursos}, \texttt{ediciones}, \texttt{grupos} y \texttt{sesiones}.
+    \item \textbf{Requisitos de ingreso:} \texttt{requisitos}, \texttt{curso\_requisito} y \texttt{participante\_requisito}.
+    \item \textbf{Matrícula y control financiero:} \texttt{inscripciones}, \texttt{lista\_espera} y \texttt{pagos}.
+    \item \textbf{Contenido pedagógico y evaluación:} \texttt{modulos\_curso}, \texttt{materiales\_curso}, \texttt{actividades}, \texttt{entregas}, \texttt{evaluaciones}, \texttt{asistencias} y \texttt{constancias}.
+\end{enumerate}
+
+\subsection{Relaciones, cardinalidades e integridad referencial}
+\label{sec:relaciones_cardinalidades}
+
+El diseño relacional satisface rigurosamente los principios de normalización (Tercera Forma Normal, 3FN). En el cuadro \ref{tabla:relaciones_bd} se detallan las principales asociaciones entre entidades del sistema, especificando sus cardinalidades y las políticas de integridad referencial adoptadas.
+
+\begin{table}[htbp]
+\centering
+\caption{Principales relaciones, cardinalidades y restricciones del esquema de datos.}
+\label{tabla:relaciones_bd}
+\small
+\begin{tabularx}{\textwidth}{|p{3.2cm}|p{3.0cm}|p{2.2cm}|X|}
+\hline
+\rowcolor[gray]{0.9}
+\textbf{Entidad Origen} & \textbf{Entidad Destino} & \textbf{Cardinalidad} & \textbf{Restricción / Tabla Intermedia} \\
+\hline
+\texttt{instituciones} & \texttt{cursos} & $1:N$ & Clave foránea \texttt{institucion\_id} con \texttt{restrictOnDelete}. \\
+\hline
+\texttt{users} & \texttt{roles} & $N:M$ & Tabla intermedia asociativa \texttt{usuario\_rol} con \texttt{institucion\_id}. \\
+\hline
+\texttt{roles} & \texttt{permisos} & $N:M$ & Tabla intermedia \texttt{rol\_permiso}. \\
+\hline
+\texttt{cursos} & \texttt{ediciones} & $1:N$ & Clave foránea \texttt{curso\_id} con \texttt{restrictOnDelete}. \\
+\hline
+\texttt{ediciones} & \texttt{grupos} & $1:N$ & Clave foránea \texttt{edicion\_id} con \texttt{restrictOnDelete}. \\
+\hline
+\texttt{grupos} & \texttt{instructores} & $N:M$ & Tabla intermedia \texttt{grupo\_instructor} con atributos de titularidad. \\
+\hline
+\texttt{grupos} & \texttt{sesiones} & $1:N$ & Clave foránea \texttt{grupo\_id} para sesiones síncronas virtuales. \\
+\hline
+\texttt{cursos} & \texttt{requisitos} & $N:M$ & Tabla intermedia asociativa \texttt{curso\_requisito} con campo \texttt{obligatorio}. \\
+\hline
+\texttt{participantes} & \texttt{requisitos} & $N:M$ & Tabla asociativa \texttt{participante\_requisito} con evidencia y validación. \\
+\hline
+\texttt{participantes} & \texttt{grupos} & $N:M$ & Modelada mediante la entidad transaccional \texttt{inscripciones}. \\
+\hline
+\texttt{inscripciones} & \texttt{pagos} & $1:N$ & Clave foránea \texttt{inscripcion\_id} con \texttt{restrictOnDelete}. \\
+\hline
+\texttt{cursos} & \texttt{modulos\_curso} & $1:N$ & Clave foránea \texttt{curso\_id} para secuenciación temaria. \\
+\hline
+\texttt{modulos\_curso} & \texttt{actividades} & $1:N$ & Clave foránea \texttt{modulo\_id} con puntajes máximos e intentos. \\
+\hline
+\texttt{actividades} & \texttt{entregas} & $1:N$ & Clave foránea \texttt{actividad\_id} e \texttt{inscripcion\_id}. \\
+\hline
+\texttt{entregas} & \texttt{evaluaciones} & $1:1$ & Asociación unívoca con calificación y retroalimentación. \\
+\hline
+\texttt{inscripciones} & \texttt{constancias} & $1:1$ & Asociación unívoca con identificador único de folio digital. \\
+\hline
+\end{tabularx}
+\end{table}
+
+Para salvaguardar la integridad de los datos institucionales, las claves foráneas aplican de manera generalizada la restricción \texttt{restrictOnDelete()} en lugar de eliminaciones en cascada (\texttt{cascadeOnDelete()}). Esto impide que la supresión accidental de una entidad superior (por ejemplo, una edición o un curso) provoque la destrucción silenciosa de registros históricos de alumnos, calificaciones o pagos.
+
+\subsection{Evolución del esquema y vigencias de acceso}
+\label{sec:evolucion_esquema}
+
+Un aspecto crucial en el desarrollo del esquema fue el modelado de la temporalidad en los procesos de inscripción. En la migración \texttt{2026\_10\_26\_100023\_create\_inscripciones\_table.php}, el equipo incorporó los siguientes atributos temporales:
+\begin{itemize}
+    \item \texttt{reserva\_vence\_at}: Marca de tiempo (\textit{timestamp}) que delimita el plazo máximo en el que una plaza en estado \texttt{pendiente\_pago} queda reservada para el solicitante. Si el pago no se registra antes de dicho vencimiento, la reserva se considera caducada y no genera derechos sobre el cupo.
+    \item \texttt{fecha\_inscripcion}: Momento exacto en que la inscripción pasa al estado \texttt{confirmada}.
+    \item \texttt{fecha\_cancelacion}: Momento en que la inscripción queda cancelada.
+\end{itemize}
+
+Respecto a las \textbf{políticas de vigencia de acceso a los cursos y prórrogas configurables} (por ejemplo, el periodo base propuesto de 30 días de acceso para cursos autogestionados), es indispensable precisar técnicamente que:
+\begin{enumerate}
+    \item El campo \texttt{reserva\_vence\_at} existe en el esquema y se encuentra completamente validado para la reserva transaccional de cupos de pago.
+    \item La vigencia de acceso pedagógico al curso y las extensiones voluntarias de plazo constituyen reglas de negocio definidas en la especificación del sistema, pero \textbf{no cuentan todavía con una tabla dedicada de prórrogas en las migraciones actuales del repositorio}. Su persistencia se encuentra planificada como un incremento futuro dentro del esquema relacional.
+\end{enumerate}
+
+\subsection{Motores de base de datos: MariaDB, SQLite y PostgreSQL}
+\label{sec:motores_bd}
+
+El proyecto contempla una diferenciación rigurosa respecto al rol desempeñado por distintos motores de bases de datos a lo largo de su ciclo de vida:
+
+\begin{itemize}
+    \item \textbf{MariaDB (Motor Oficial Aprobado):} MariaDB, operando con tablas transaccionales InnoDB, constituye el sistema gestor de bases de datos seleccionado, aprobado en los objetivos de la Memoria y destinado al entorno de desarrollo principal y eventual producción. Provee soporte completo para restricciones foráneas, índices relacionales avanzados y bloqueos pesimistas de concurrencia a nivel de fila (\texttt{FOR UPDATE}).
+    \item \textbf{SQLite en memoria (Entorno de Pruebas Automatizadas):} Se utiliza de forma exclusiva dentro del arnés de pruebas automatizadas con PHPUnit (\texttt{DB\_DATABASE=:memory:}). Su propósito es proveer una validación determinista, ultrarrápida y completamente aislada de la lógica de negocio y las migraciones, sin requerir dependencias de red ni alterar bases de datos de desarrollo.
+    \item \textbf{PostgreSQL (Propuesta en Contenedorización):} Durante las fases de exploración de infraestructura reproducible para Docker, surgieron configuraciones preliminares que incorporaban imágenes de PostgreSQL. No obstante, se aclara formalmente que \textbf{la adopción de PostgreSQL constituye únicamente una alternativa técnica preliminar de infraestructura}, sin que se haya modificado el objetivo general del proyecto ni se cuente con evidencia empírica de una migración y validación integral del esquema en dicho motor. MariaDB permanece como la base de datos oficial del proyecto.
+\end{itemize}
+
+\section{Desarrollo del backend}
+\label{sec:desarrollo_backend}
+
+\subsection{Modelos Eloquent y lógica de relaciones}
+\label{sec:modelos_eloquent}
+
+Los modelos Eloquent representan la capa objeto-relacional del sistema. Cada modelo define rigurosamente sus asociaciones mediante métodos expresivos y tipados estrictos. Por ejemplo, el modelo \texttt{Inscripcion} articula las relaciones clave hacia \texttt{Participante}, \texttt{Grupo}, \texttt{Pago}, \texttt{Entrega}, \texttt{Asistencia} y \texttt{Constancia}, incorporando casts nativos para el manejo determinista de fechas e importes monetarios.
+
+Asimismo, los modelos de usuarios y actores educativos (\texttt{User}, \texttt{Participante}, \texttt{Instructor}) incorporan métodos para consultar roles y permisos en el ámbito institucional (\texttt{rolesEnInstitucion()}, \texttt{permisosEnInstitucion()}), impidiendo que una consulta acceda accidentalmente a privilegios asignados en otra institución adscrita.
+
+\subsection{Implementación de la capa de servicios de negocio}
+\label{sec:servicios_negocio}
+
+Las operaciones transaccionales críticas residen en la capa de servicios, donde se ejecutan dentro de bloques de transacción con manejo de reintentos ante posibles interbloqueos:
+
+\begin{lstlisting}[language=PHP, caption={Fragmento real de la lógica de inscripción en \texttt{InscripcionService.php}.}, label={lst:inscripcion_service}]
+public function inscribir(User $actor, int $institucionId, int $participanteId, int $grupoId): Inscripcion
+{
+    try {
+        return DB::transaction(function () use ($actor, $institucionId, $participanteId, $grupoId): Inscripcion {
+            $actor = $this->acceso->usuario($actor, $institucionId);
+            $grupo = $this->acceso->grupo($institucionId, $grupoId, true);
+            $participante = $this->acceso->participante($institucionId, $participanteId);
+            $this->acceso->exigirPropietarioOPermiso($actor, $institucionId, $participante, 'inscripciones.gestionar');
+            $this->exigirApertura($grupo);
+            $this->exigirRequisitos($grupo, $participante, $institucionId);
+
+            if ($grupo->inscripciones()->where('participante_id', $participanteId)->lockForUpdate()->first()) {
+                throw ValidationException::withMessages(['inscripcion' => 'Ya existe una inscripcion de este participante al grupo, incluso si fue cancelada.']);
+            }
+            $this->exigirCupo($grupo);
+            $precio = Importes::centavos($grupo->edicion->precio, 'precio');
+            
+            $inscripcion = new Inscripcion;
+            $inscripcion->participante_id = $participanteId;
+            $inscripcion->grupo_id = $grupoId;
+            $inscripcion->precio_acordado = Importes::decimal($precio);
+            if ($precio === 0) {
+                $inscripcion->estado = $this->reglas->estado('inscripcion.confirmada');
+                $inscripcion->fecha_inscripcion = now();
+            } else {
+                $inscripcion->estado = $this->reglas->estado('inscripcion.pendiente_pago');
+                $inscripcion->reserva_vence_at = now()->addMinutes($this->reglas->minutosDeReserva());
+            }
+            $inscripcion->save();
+            $this->auditoria->registrar($actor, $institucionId, 'inscripciones.crear', $inscripcion, ['estado' => $inscripcion->estado]);
+
+            return $inscripcion;
+        }, 3);
+    } catch (UniqueConstraintViolationException) {
+        throw ValidationException::withMessages(['inscripcion' => 'La inscripcion ya fue registrada por otra operacion.']);
+    }
+}
+\end{lstlisting}
+
+En el código del listado \ref{lst:inscripcion_service} se aprecian las siguientes decisiones de ingeniería de software:
+\begin{enumerate}
+    \item \textbf{Aislamiento y autorización en el servidor:} Se invoca \texttt{AutorizacionInstitucional} para recargar al actor y verificar que posea permisos dentro de la institución específica antes de realizar cualquier consulta de negocio.
+    \item \textbf{Protección contra carreras de cupo:} Se ejecuta una lectura bloqueante (\texttt{lockForUpdate()}) al comprobar si ya existía una inscripción previa y al verificar la disponibilidad de plazas mediante el método privado \texttt{exigirCupo()}.
+    \item \textbf{Cálculo aritmético seguro:} El precio de la edición se procesa mediante \texttt{Importes::centavos()}, transformando el valor monetario a enteros para prevenir discrepancias por redondeo de coma flotante.
+    \item \textbf{Trazabilidad obligatoria:} Toda alta de inscripción dispara inmediatamente el registro en la bitácora mediante \texttt{AuditoriaService}, garantizando que si el registro de auditoría falla, la transacción completa se revierta (\textit{rollback}).
+\end{enumerate}
+
+\subsection{Subsistema de evaluación académica y seguimiento}
+\label{sec:backend_evaluaciones}
+
+El backend de evaluaciones se encuentra gobernado por la clase \texttt{EvaluacionService.php}. El servicio recibe una entrega realizada por un participante, valida que la inscripción se encuentre en estado confirmada, corrobora que el instructor que califica esté formalmente asignado al grupo mediante \texttt{exigirGrupoInstructor()}, y comprueba que la calificación no exceda el puntaje máximo configurado para la actividad en la base de datos.
+
+En concordancia con los principios pedagógicos de aprendizaje para el dominio, el servicio valida que el número de intento de la entrega sea consistente (\texttt{\$entrega->numero\_intento <= \$actividad->intentos\_maximos}), sentando la base para la ejecución de los ciclos de reforzamiento académico.
+
+\section{Desarrollo del frontend}
+\label{sec:desarrollo_frontend}
+
+\subsection{Identidad visual y principios de diseño}
+\label{sec:identidad_visual}
+
+El diseño de la interfaz de usuario de Aula Verde se concibió bajo una estética sobria, moderna y orientada a la accesibilidad. Se adoptó una paleta cromática basada en cinco tonos de verde institucionales complementados con fondos neutros de alto contraste, tal como se especifica en el cuadro \ref{tabla:paleta_colores}.
+
+\begin{table}[htbp]
+\centering
+\caption{Paleta cromática institucional de Aula Verde.}
+\label{tabla:paleta_colores}
+\small
+\begin{tabularx}{\textwidth}{|p{3.2cm}|p{2.2cm}|p{2.8cm}|X|}
+\hline
+\rowcolor[gray]{0.9}
+\textbf{Nombre del Token} & \textbf{Código HEX} & \textbf{Muestra Visual} & \textbf{Aplicación en la Interfaz} \\
+\hline
+\texttt{--light-green} & \texttt{\#BEEF9E} & Verde Claro & Acentos visuales, barras de progreso y elementos destacados. \\
+\hline
+\texttt{--muted-olive} & \texttt{\#A6C36F} & Oliva Suave & Acciones secundarias, bordes suaves e iconos ilustrativos. \\
+\hline
+\texttt{--palm-leaf} & \texttt{\#828C51} & Hoja de Palma & Etiquetas informativas, subtítulos y textos auxiliares. \\
+\hline
+\texttt{--pine-teal} & \texttt{\#335145} & Verde Pino & Botones principales, cabeceras de tablas y navegación. \\
+\hline
+\texttt{--evergreen} & \texttt{\#1E352F} & Siempreverde & Titulares principales, barras laterales (\textit{sidebar}) y texto base. \\
+\hline
+\end{tabularx}
+\end{table}
+
+En el ámbito tipográfico, se seleccionó la fuente \textbf{Manrope} como familia tipográfica principal para el cuerpo de texto, formularios, botones y paneles de control debido a su legibilidad en pantallas digitales, complementada selectivamente con \textbf{Noto Serif} para titulares de jerarquía superior en el sitio público.
+
+Asimismo, se estableció una restricción estricta de diseño: \textbf{se prohíbe el uso de emojis en código, textos de interfaz o comentarios}. En su lugar, el sistema emplea exclusivamente iconos vectoriales limpios en formato SVG mediante el componente Blade reutilizable \texttt{<x-icon>}. Adicionalmente, la interfaz incorpora soporte para modo claro y modo oscuro (\textit{dark mode}), integrando un control de alternancia visible directamente en la barra de navegación pública y privada.
+
+\subsection{Estructura de vistas Blade y componentes modulares}
+\label{sec:vistas_blade}
+
+El frontend se organiza siguiendo el principio de no duplicación de código mediante componentes y plantillas maestras reutilizables en la carpeta \texttt{resources/views/}:
+
+\begin{itemize}
+    \item \textbf{Plantillas maestras (\texttt{layouts/}):} \texttt{app-base.blade.php} provee la estructura HTML5 básica con metadatos de accesibilidad; \texttt{sitio-publico.blade.php} gobierna la presentación de la página principal; \texttt{portal-estudiante.blade.php} define el entorno de navegación del participante; y \texttt{portal-privado.blade.php} centraliza la interfaz de gestión administrativa compartida por los cuatro roles operativos (Administrador, Coordinador, Recepción, Instructor), adaptando las opciones visibles según los permisos efectivos del usuario.
+    \item \textbf{Secciones parciales (\texttt{partials/}):} \texttt{navegacion-publica.blade.php}, \texttt{navegacion-privada.blade.php} y \texttt{pie-publico.blade.php}.
+    \item \textbf{Componentes reutilizables (\texttt{components/}):} \texttt{icon.blade.php} para la inserción de gráficos SVG paramétricos, \texttt{beneficio.blade.php} para destacar características de los cursos y \texttt{catalogo-pendiente.blade.php} para indicar estados transitorios de oferta curricular.
+\end{itemize}
+
+\subsection{Estado de las interfaces de usuario}
+\label{sec:estado_interfaces}
+
+Es necesario distinguir con precisión el grado de madurez de las distintas vistas del sistema:
+\begin{enumerate}
+    \item \textbf{Landing page pública (\texttt{publico/inicio.blade.php}):} Completamente desarrollada, funcional y responsiva. Presenta la oferta de formación 100\,\% virtual, las dos modalidades de aprendizaje (autogestionada y acompañada por instructor), los beneficios pedagógicos y el flujo paso a paso de acceso.
+    \item \textbf{Prototipos de portales privados (\texttt{tesis/estudiante/} y \texttt{tesis/privado/}):} Creados como prototipos Blade enlazados a través de las rutas demo \texttt{\_demo-tesis/}. Permiten verificar la coherencia visual, el contraste y la estructura modular de los paneles.
+    \item \textbf{Formularios interactivos finales de autenticación y carga de evidencias:} Definidos en diseño y especificación, encontrándose en proceso de vinculación interactiva con las rutas productivas del backend.
+\end{enumerate}
+
+\section{Implementación de mecanismos de seguridad}
+\label{sec:seguridad}
+
+\subsection{Autenticación y ciclo de vida de credenciales}
+\label{sec:seguridad_autenticacion}
+
+La seguridad de las cuentas de usuario se fundamenta en las recomendaciones internacionales de OWASP \cite{owasp2026password}. Las contraseñas se almacenan mediante el algoritmo adaptativo \textbf{Bcrypt}, el cual genera una sal aleatoria individual y aplica factores de trabajo computacionalmente costosos que neutralizan ataques por fuerza bruta y diccionarios precalculados.
+
+El ciclo de vida de la cuenta se encuentra gobernado por el atributo \texttt{users.estado\_cuenta}, cuyos valores permitidos son \texttt{pendiente}, \texttt{activa} e \texttt{inactiva}. Para acceder a cualquier recurso protegido, el usuario debe poseer su cuenta en estado \texttt{activa}, condición que se comprueba en el middleware de seguridad del servidor.
+
+\subsection{Middleware de autorización y contexto institucional}
+\label{sec:middleware_seguridad}
+
+El control de acceso descansa en una serie de clases de middleware registradas formalmente en el archivo \texttt{bootstrap/app.php}:
+\begin{itemize}
+    \item \texttt{cuenta.activa} (\texttt{CuentaActivaMiddleware}): Verifica que el usuario se encuentre autenticado y que su cuenta no esté suspendida ni eliminada lógicamente (\texttt{SoftDeletes}).
+    \item \texttt{rol} (\texttt{RolMiddleware}): Comprueba que el usuario posea al menos uno de los roles institucionales requeridos para la ruta solicitada.
+    \item \texttt{permiso} (\texttt{PermisoMiddleware}): Evalúa privilegios atómicos específicos concedidos a través de la tabla intermedia \texttt{rol\_permiso}.
+    \item Middleware por perfil: \texttt{administrador}, \texttt{coordinador}, \texttt{recepcion}, \texttt{instructor} y \texttt{participante}.
+\end{itemize}
+
+En el listado \ref{lst:cuenta_activa_mw} se presenta la implementación del filtrado de acceso en la clase base abstracta de middleware.
+
+\begin{lstlisting}[language=PHP, caption={Filtrado de sesión y estado de cuenta en \texttt{AccesoMiddleware.php}.}, label={lst:cuenta_activa_mw}]
+protected function usuarioActivo(Request $request): User
+{
+    $usuario = $request->user();
+
+    if (! $usuario instanceof User || ! $usuario->exists || $usuario->trashed()) {
+        throw new HttpException(401, 'Debes iniciar sesion para acceder.');
+    }
+
+    if ($usuario->estado_cuenta !== 'activa') {
+        throw new HttpException(403, 'Tu cuenta no esta activa.');
+    }
+
+    return $usuario;
+}
+\end{lstlisting}
+
+Un principio cardinal de seguridad aplicado en Aula Verde es que \textbf{ocultar elementos gráficos en las vistas Blade no constituye una medida de autorización válida}. Si un participante manipula el DOM o emite peticiones HTTP artesanales hacia un punto final administrativo, el servidor intercepta la petición en el middleware y en la capa de servicios mediante \texttt{AutorizacionInstitucional}, retornando códigos de error HTTP 401 (No autenticado) o HTTP 403 (No autorizado).
+
+\subsection{Protección CSRF y validación de entradas}
+\label{sec:csrf_validacion}
+
+El sistema implementa de forma nativa la protección contra la falsificación de peticiones en sitios cruzados (CSRF) mediante tokens criptográficos verificados en cada solicitud POST, PUT o DELETE. Asimismo, todos los datos entrantes se validan estrictamente mediante reglas de tipado, rango, existencia de claves foráneas y expresiones regulares en la capa de servicios (\texttt{Validator::make()}), asegurando que ningún dato malformado alcance la persistencia.
+
+\section{Pruebas y validación durante el desarrollo}
+\label{sec:pruebas_validacion}
+
+\subsection{Estrategia de pruebas con PHPUnit y entorno aislado}
+\label{sec:estrategia_pruebas}
+
+El aseguramiento de la calidad del software durante el desarrollo se sustentó en la construcción sistemática de una suite de pruebas automatizadas ejecutadas mediante el framework \textbf{PHPUnit 12.5}. La suite se concibió para verificar rigurosamente el cumplimiento de las reglas de negocio, los límites aritméticos, los flujos de autorización y las transiciones de estado de las entidades.
+
+Para garantizar que la ejecución de pruebas fuera determinista, reproducible y no contaminara los datos de desarrollo ni dependiera de conexiones de red volátiles, el archivo \texttt{phpunit.xml} fuerza un \textbf{entorno de pruebas completamente aislado}:
+\begin{itemize}
+    \item \texttt{APP\_ENV=testing}
+    \item \texttt{DB\_CONNECTION=sqlite}
+    \item \texttt{DB\_DATABASE=:memory:}
+\end{itemize}
+
+La clase base \texttt{Tests\textbackslash TestCase} verifica activamente que estas variables coincidan exactamente antes de permitir la ejecución del trait \texttt{RefreshDatabase}, eliminando de la configuración en memoria cualquier conexión externa residual hacia MariaDB o MySQL. En cada ejecución, la base de datos en memoria se crea, migra mediante las 35 migraciones reales del proyecto, ejecuta los casos de prueba y se destruye al concluir, garantizando total inocuidad sobre el sistema.
+
+\subsection{Cobertura funcional de la suite de pruebas}
+\label{sec:cobertura_pruebas}
+
+La suite de pruebas comprende pruebas unitarias y de integración que abarcan la totalidad de los servicios y componentes críticos. En el cuadro \ref{tabla:cobertura_pruebas} se sintetiza la distribución de las pruebas construidas.
+
+\begin{table}[htbp]
+\centering
+\caption{Distribución y casos de verificación de la suite de pruebas automatizadas.}
+\label{tabla:cobertura_pruebas}
+\small
+\begin{tabularx}{\textwidth}{|p{4.2cm}|p{1.8cm}|X|}
+\hline
+\rowcolor[gray]{0.9}
+\textbf{Archivo de Prueba} & \textbf{Tipo} & \textbf{Casos de Verificación Principales} \\
+\hline
+\texttt{SolicitudRegistroServiceTest} & Integración & Solicitud pública sin privilegios, validación de correo, duplicados en misma institución, aprobación autorizada e idempotente, y reversión transaccional (\textit{rollback}) ante fallo de auditoría. \\
+\hline
+\texttt{InscripcionServiceTest} & Integración & Inscripciones gratuitas y de costo, cálculo de precio real, rechazo de duplicados, control de último cupo, vencimiento de reservas temporales y validación de requisitos obligatorios. \\
+\hline
+\texttt{PagoServiceTest} & Integración & Registro de comprobantes pendientes, unicidad de referencias bancarias, precisión de montos, verificación por personal autorizado y rechazo de pagos extemporáneos. \\
+\hline
+\texttt{EvaluacionServiceTest} & Integración & Evaluación manual por instructor asignado, validación de puntaje máximo dentro de \texttt{DECIMAL(8,2)}, idempotencia, inmutabilidad tras calificación y privacidad institucional. \\
+\hline
+\texttt{ConstanciaServiceTest} & Integración & Diagnóstico de elegibilidad, detección de evaluaciones pendientes, rechazo de asistencias de otros grupos y comprobación de permisos de emisión. \\
+\hline
+\texttt{AutorizacionInstitucionalTest} & Integración & Recarga de cuentas, bloqueo de usuarios inactivos o eliminados, control estricto de roles por institución y ausencia de excepciones arbitrarias. \\
+\hline
+\texttt{AuditoriaServiceTest} & Integración & Registro atómico de eventos, actores reales o anónimos en esquemas públicos y comprobación de reversión de cambios si la bitácora falla. \\
+\hline
+\texttt{ImportesTest} & Unitaria & Transformación exacta a centavos enteros, validación de límites numéricos y rechazo estricto de valores de coma flotante (\textit{float}), negativos o cadenas inválidas. \\
+\hline
+\texttt{ReglasOperacionTest} & Unitaria & Coherencia de estados del esquema, exclusión de decisiones ausentes, verificación de duraciones y detección de estados duplicados. \\
+\hline
+\texttt{InicioPublicoTest} & Funcional & Verificación de la respuesta HTTP 200 en la landing page pública, contenido semántico y presencia de elementos de navegación. \\
+\hline
+\texttt{TestingEnvironmentTest} & Integración & Comprobación del motor SQLite en memoria y verificación de ausencia de conexiones a bases de datos de desarrollo. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\subsection{Resultados comprobados y límites de verificación}
+\label{sec:resultados_limites_pruebas}
+
+La ejecución integral de la suite de pruebas construida arrojó un resultado de \textbf{113 pruebas aprobadas y 353 aserciones satisfactorias (0 fallos y 0 errores)}, documentado formalmente en el registro técnico del proyecto (\texttt{tests/README.md}).
+
+No obstante, desde la perspectiva del rigor metodológico de la ingeniería de software, es imprescindible señalar las \textbf{limitaciones inherentes a este entorno de validación}:
+\begin{enumerate}
+    \item Las pruebas sobre SQLite en memoria evalúan secuencialmente la lógica de negocio, las validaciones y la coherencia de las migraciones; sin embargo, SQLite no soporta ni procesa cláusulas de bloqueo pesimista \texttt{FOR UPDATE}.
+    \item Por tanto, estos resultados prueban que las reglas de negocio están correctamente programadas, pero \textbf{no demuestran empíricamente el comportamiento de MariaDB bajo concurrencia masiva real, contención de transacciones, bloqueos a nivel de fila ni prevención de interbloqueos (\textit{deadlocks})}.
+    \item La verificación exhaustiva de concurrencia requerirá en fases posteriores una suite específica ejecutada contra una instancia aislada del motor MariaDB.
+\end{enumerate}
+
+\section{Contenedorización y preparación para el despliegue}
+\label{sec:despliegue_docker}
+
+\subsection{Estrategia de virtualización y arquitectura proyectada}
+\label{sec:estrategia_docker}
+
+Para garantizar la reproducibilidad del entorno de ejecución de Aula Verde e independizar el software de las particularidades del sistema operativo anfitrión, se formuló una estrategia de virtualización ligera basada en contenedores Docker \cite{docker2024overview}. El objetivo consiste en estandarizar las versiones exactas del intérprete PHP, las extensiones compiladas necesarias para Laravel (tales como \texttt{pdo\_mysql}, \texttt{mbstring}, \texttt{openssl}, \texttt{tokenizer}, \texttt{xml} y \texttt{ctype}) y la configuración del servidor web.
+
+La arquitectura de contenedores prevista comprende tres servicios coordinados mediante Docker Compose:
+\begin{enumerate}
+    \item \textbf{Servidor Web (Nginx):} Contenedor basado en una imagen ligera de Nginx, configurado como proxy inverso para gestionar la terminación de solicitudes HTTP/HTTPS, despachar de forma estandarizada los archivos estáticos (CSS, JavaScript, fuentes tipográficas e imágenes) y delegar el procesamiento dinámico al backend.
+    \item \textbf{Servidor de Aplicación (PHP-FPM):} Contenedor con PHP 8.4 configurado con el gestor de procesos FastCGI (PHP-FPM), encargado de ejecutar el código fuente de Laravel, procesar las peticiones delegadas por Nginx y coordinar las tareas en cola.
+    \item \textbf{Servidor de Base de Datos (MariaDB):} Contenedor dedicado al motor relacional MariaDB, provisto de volúmenes persistentes montados en el sistema anfitrión para asegurar que los datos no se destruyan ante el reinicio o actualización de los contenedores.
+\end{enumerate}
+
+\subsection{Estado real de los artefactos de despliegue}
+\label{sec:estado_despliegue}
+
+En estricto apego a la transparencia académica, se documenta que la estrategia de contenedorización representa un diseño de arquitectura e infraestructura planificado:
+\begin{itemize}
+    \item En la copia actual del repositorio de código, los archivos específicos de despliegue (\texttt{Dockerfile}, \texttt{compose.yaml}, configuraciones personalizadas de Nginx y scripts de entrada \texttt{entrypoint.sh}) se encuentran en fase de especificación y preparación técnica, no habiéndose ejecutado aún en un entorno de producción en la nube.
+    \item El sistema ha sido probado y ejecutado en entornos locales de desarrollo con PHP y Composer, manteniéndose la preparación de contenedores como el entregable final previo a la puesta en marcha institucional.
+\end{itemize}
+
+Asimismo, en lo relativo a las propuestas preliminares que sugerían el uso de PostgreSQL en entornos de contenedores, se reitera que el motor de base de datos oficial, formalmente aprobado en los objetivos específicos del proyecto y documentado en la arquitectura del sistema, continúa siendo \textbf{MariaDB}. Cualquier migración o compatibilidad multiplataforma futura deberá evaluarse mediante pruebas de regresión antes de considerarse una decisión definitiva.
